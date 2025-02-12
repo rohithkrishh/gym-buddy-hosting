@@ -1,0 +1,127 @@
+<%- include("../../views/partials/user/header") %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Operations</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container1 {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h3 {
+            color: #faa406;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .balance {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #34a853;
+        }
+        .transactions {
+            margin-top: 30px;
+        }
+        h4 {
+            color: #5f6368;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .transaction {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .transaction p {
+            margin: 5px 0;
+        }
+        .transaction p:first-child {
+            font-weight: bold;
+            color: #1a73e8;
+        }
+        .transaction p:nth-child(2) {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .credit {
+            color: #34a853;
+        }
+        .debit {
+            color: #ea4335;
+        }
+        .transaction p:last-child {
+            font-size: 14px;
+            color: #5f6368;
+        }
+    </style>
+</head>
+<body>
+    <div class="container1">
+        <h3>My Wallet</h3>
+        <div class="balance">Balance: ₹<span id="balance">0.00</span></div>
+        
+        <div class="transactions">
+            <h4>Recent Transactions</h4>
+            <div id="transactionList"></div>
+        </div>
+    </div>
+
+    <script>
+        const userId = '<%= userId %>';
+
+        // Fetch and display balance
+        async function fetchBalance() {
+            try {
+                const response = await fetch(`/balance/${userId}`);
+                if (!response.ok) throw new Error('Failed to fetch balance');
+                const data = await response.json();
+                document.getElementById('balance').textContent = data.balance.toFixed(2);
+
+                console.log("FFFF",data.transaction)
+                const transactionList = document.getElementById('transactionList');
+                transactionList.innerHTML = '';
+                
+                data.transaction.forEach(transaction => {
+                    const transactionEl = document.createElement('div');
+                    transactionEl.className = 'transaction';
+                    transactionEl.innerHTML = `
+                        <p>${transaction.description}</p>
+                        <p class="${transaction.type === 'credit' ? 'credit' : 'debit'}">
+                            ${transaction.type === 'credit' ? '+' : '-'}₹${transaction.amount.toFixed(2)}
+                        </p>
+                        <p>${new Date(transaction.date).toLocaleString()}</p>
+                    `;
+                    transactionList.appendChild(transactionEl);
+                });
+            
+            } catch (error) {
+                console.error('Error fetching balance:', error);
+            }
+        }
+
+        // Initial fetch
+        fetchBalance();
+    </script>
+</body>
+</html>
+
+<%- include("../../views/partials/user/footer") %>

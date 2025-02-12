@@ -1,0 +1,37 @@
+
+
+
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; background-color: #f8f8f8; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); animation: fadeIn 0.5s ease-out;">
+    <h1 style="text-align: center; color: #e74c3c; font-size: 24px; margin-bottom: 20px; animation: slideDown 0.5s ease-out;">Payment Failed</h1>
+    <p style="color: #333; line-height: 1.6; margin-bottom: 20px; animation: fadeIn 0.5s ease-out 0.2s both;">
+        We're sorry, but your payment could not be processed at this time. Please review the details below and try again.
+    </p>
+    <div style="background-color: #fff; padding: 15px; border-radius: 4px; margin-bottom: 20px; animation: fadeIn 0.5s ease-out 0.4s both;">
+        <div style="margin-bottom: 10px;">
+            <span style="font-weight: bold; margin-right: 10px;">Order ID:</span>
+            <span><%= orderId %></span>
+        </div>
+       
+    </div>
+    <p style="color: #333; line-height: 1.6; margin-bottom: 20px; animation: fadeIn 0.5s ease-out 0.6s both;">
+        If you continue to experience issues, please contact our support team for assistance.
+    </p>
+    <a href="/userProfile" style="display: inline-block; background-color: #3498db; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 4px; transition: background-color 0.3s, transform 0.3s; animation: fadeIn 0.5s ease-out 0.8s both;" onmouseover="this.style.backgroundColor='#2980b9'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='#3498db'; this.style.transform='scale(1)';">GO to orders</a>
+</div>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes slideDown {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+</style>
+
+
+
+
+
+

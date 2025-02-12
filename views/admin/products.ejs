@@ -1,0 +1,368 @@
+<%- include("../../views/partials/admin/header") %>
+<style>
+    .content-header {
+        padding: 20px 0;
+        background-color: #f8f9fa;
+    }
+    .content-title {
+        font-size: 24px;
+        color: #333;
+    }
+    .search-form {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    .search-input {
+        border-radius: 20px;
+        border: 1px solid #ced4da;
+    }
+    .search-button {
+        border-radius: 0 20px 20px 0;
+        background-color: #007bff;
+        color: white;
+    }
+    .search-button:hover {
+        background-color: #0056b3;
+    }
+    .table-responsive {
+        overflow-x: auto;
+    }
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        padding: 12px;
+    }
+    .table td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0,0,0,.05);
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,0,0,.075);
+    }
+    .btn {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #212529;
+    }
+    .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+        color: white;
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+    }
+    .page-item {
+        margin: 0 2px;
+    }
+    .page-link {
+        padding: 6px 12px;
+        border: 1px solid #dee2e6;
+        color: #007bff;
+        background-color: #fff;
+        transition: all 0.3s ease;
+    }
+    .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+    .page-link:hover {
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+</style>
+
+<div class="content-header">
+    <div>
+        <h2 class="content-title card-title">Products</h2>
+    </div>
+</div>
+
+<header class="card-header text-center mb-4">
+    <form action="" method="get" class="d-inline search-form">
+        <div class="input-group input-group-sm">
+            <input type="text" class="form-control search-input" placeholder="Search products or brands" name="search">
+            <button class="btn search-button" type="submit">Search</button>
+        </div>
+    </form>
+</header>
+
+<div class="table-responsive mt-4">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Product Name</th>
+                <th scope="col">Brand</th>
+                <th scope="col">Category</th>
+                <th scope="col">Sale Price</th>
+                <th scope="col">Offer</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Variants</th>
+                <th scope="col">Actions</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            <% if (data.length === 0) { %>
+                <tr>
+                    <td colspan="9" class="text-center">No products found. Please add products to display them here.</td>
+                </tr>
+            <% } else { %>
+                <% for (let i = data.length - 1; i >= 0; i--) { %>
+                    <tr>
+                        <td><%= data[i].productName %></td>
+                        <td><%= data[i].brand %></td>
+                        <td><%= data[i].category?.name || "Unknown Category" %></td>
+                
+                        <!-- Sale Price or Regular Price (Variant Level) -->
+                        <td>
+                            <% if (data[i].variants && data[i].variants.length > 0) { %>
+                                <ul class="list-unstyled">
+                                    <% data[i].variants.forEach(variant => { %>
+                                        <li>
+                                            Sale Price: ₹<%= variant.salePrice || 0 %>, 
+                                            Regular Price: ₹<%= variant.regularPrice || 0 %>
+                                        </li>
+                                    <% }); %>
+                                </ul>
+                            <% } else { %>
+                                No Variants
+                            <% } %>
+                        </td>
+                
+                        <!-- Offer -->
+                        <td>
+                            <% if (data[i].highestOffer) { %>
+                                <%= data[i].highestOffer %>%
+                            <% } else { %>
+                                0%
+                            <% } %>
+                        </td>
+                
+                        <!-- Quantity -->
+                        <!-- <td><%= data[i].quantity %></td> -->
+                
+                        <!-- Variants Details -->
+                        <td>
+                           
+                            <% if (data[i].variants && data[i].variants.length > 0) { %>
+                                <ul class="list-unstyled">
+                                    <% data[i].variants.forEach(variant => { %>
+                                        <li class="mb-1">
+                                            <!-- <% if (variant.categoryType === "strength") { %> -->
+                                                Weight: <%= variant.weight %> kg, 
+                                            <!-- <% } else if (variant.categoryType === "cardio") { %> -->
+                                                Type: <%= variant.type %>, 
+                                            <!-- <% } %> -->
+                                            Stock: <%= variant.stock %>, 
+                                            SKU: <%= variant.sku %>
+                                        </li>
+                                    <% }); %>
+                                </ul>
+                            <% } else { %>
+                                No Variants
+                            <% } %>
+                        </td>
+                
+                        <!-- Block/Unblock Button -->
+                        <td>
+                            <% if (!data[i].isBlocked) { %>
+                                <button class="btn btn-danger" onclick="confirmAction('/admin/blockProduct?id=<%= data[i]._id %>', 'block this product')">
+                                    Block
+                                </button>
+                            <% } else { %>
+                                <button class="btn btn-success" onclick="confirmAction('/admin/unblockProduct?id=<%= data[i]._id %>', 'unblock this product')">
+                                    Unblock
+                                </button>
+                            <% } %>
+                        </td>
+                
+                        <!-- Add/Update/Remove Offer and Edit -->
+                        <td>
+                            <div class="btn-group">
+                                <% if (data[i].productOffer && data[i].productOffer > 0) { %>
+                                    <button class="btn btn-warning" onclick="addOffer('<%= data[i]._id %>', <%= data[i].productOffer %>)">
+                                        Update 
+                                    </button>
+                                    <button class="btn btn-danger" onclick="removeOffer('<%= data[i]._id %>')">
+                                        Remove 
+                                    </button>
+                                <% } else { %>
+                                    <button class="btn btn-success" onclick="addOffer('<%= data[i]._id %>')">
+                                        Add 
+                                    </button>
+                                <% } %>
+                            </div>
+                            <a href="/admin/editProduct?id=<%= data[i]._id %>" class="btn btn-info mt-1">Edit</a>
+                        </td>
+                    </tr>
+                <% } %>
+               
+                <%}%>
+        </tbody>
+    </table>
+</div>
+
+<div class="container mt-4">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <% for (let i=1; i <=totalPages; i++) { %>
+                <li class="page-item <%=(i === currentPage) ? 'active' : '' %>">
+                    <a class="page-link" href="?page=<%= i %>">
+                        <%= i %>
+                    </a>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
+</div>
+
+
+    <script>
+        function confirmAction(url, action) {
+            Swal.fire({
+                title: `Are you sure you want to ${action}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
+        }
+
+        async function addOffer(productId, existingOffer = 0) {
+    try {
+        const { value: amount } = await Swal.fire({
+            title: existingOffer > 0 ? 'UpdateOffer' : 'AddOffer',
+            input: 'number',
+            inputLabel: 'Percentage',
+            inputValue: existingOffer > 0 ? existingOffer : '', // Pre-fill if updating
+            inputPlaceholder: '%',
+            inputAttributes: {
+                min: 1,
+                max: 100,
+            },
+            confirmButtonText: existingOffer > 0 ? 'Update Offer' : 'Add Offer',
+            showCancelButton: true,
+        });
+
+        if (!amount || amount <= 0 || amount > 100) {
+            Swal.fire('Invalid Input', 'Please enter a valid percentage (1-100).', 'error');
+            return;
+        }
+
+        $.ajax({
+            url: "/admin/addProductOffer",
+            method: 'post',
+            data: {
+                percentage: amount,
+                productId: productId,
+            },
+            success: (response) => {
+                if (response.status === true) {
+                    Swal.fire('Success', 'The offer has been successfully updated.', 'success')
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire('Failed', response.message || 'Failed to update offer.', 'error');
+                }
+            },
+            error: (xhr, status, error) => {
+                Swal.fire('Error', 'An error occurred while updating the offer.', 'error');
+                console.error(error);
+            },
+        });
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
+
+async function removeOffer(productId) {
+            try {
+                const result = await Swal.fire({
+                    title: "Remove Offer",
+                    text: "Are you sure you want to remove this offer?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, remove it!',
+                });
+
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/removeProductOffer",
+                        method: 'post',
+                        data: {
+                            productId: productId
+                        },
+                        success: (response) => {
+                            if (response.status === true) {
+                                Swal.fire('Removed!', 'The offer has been removed.', 'success')
+                                    .then(() => location.reload());
+                            } else {
+                                Swal.fire('Failed', response.message || 'Failed to remove offer.', 'error');
+                            }
+                        },
+                        error: (xhr, status, error) => {
+                            Swal.fire('Error', 'An error occurred while removing the offer.', 'error');
+                            console.error(error);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+
+
+    </script>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    
+
+
+    <%- include("../../views/partials/admin/footer") %>

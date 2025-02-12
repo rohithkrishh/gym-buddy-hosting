@@ -1,0 +1,156 @@
+/* General Reset */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Wrapper for Center Alignment */
+.signup-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Signup Card */
+.signup-card {
+  display: flex;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  width: 100%;
+}
+
+/* Form Section */
+.form-section {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.form-section h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+form {
+  width: 100%;
+}
+
+/* Labels */
+form label {
+  display: block;
+  margin: 10px 0 5px;
+  font-weight: bold;
+}
+
+/* Input Fields */
+form input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1.5px solid #aaa; /* Darker and more visible border */
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #fff;
+  outline: none; /* Remove default outline */
+  box-sizing: border-box;
+}
+
+/* Input Fields: Focus State */
+form input:focus {
+  border: 2px solid #007bff; /* Highlight border on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Subtle glow effect */
+}
+
+/* Placeholder Styling */
+form input::placeholder {
+  color: #888; /* Darker placeholder text */
+  opacity: 1; /* Ensure full opacity */
+}
+
+/* Submit Button */
+form button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  box-sizing: border-box;
+}
+
+form button:hover {
+  background-color: #0056b3;
+}
+
+/* Google Signup */
+.google-signup {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.google-signup span {
+  margin-right: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+.google-signup button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.google-signup img {
+  width: 30px;
+}
+
+/* Already Registered Text */
+p {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Image Section */
+.image-section {
+  flex: 1;
+  background-color: #f4f4f4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+}
+
+.image-section h2 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #333;
+}
+
+.image-section img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

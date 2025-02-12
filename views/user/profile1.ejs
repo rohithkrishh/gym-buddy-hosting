@@ -1,0 +1,539 @@
+<%- include("../../views/partials/user/header") %>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        .repay-btn {
+            background-color: #3399cc;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .repay-btn:hover {
+            background-color: #287ba3;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .repay-btn:active {
+            background-color: #1a5d7c;
+            box-shadow: none;
+            transform: translateY(0);
+        }
+
+        .faded-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            opacity: 0.5;
+            /* Makes the button look faded */
+            cursor: not-allowed;
+            /* Shows a "not-allowed" cursor to indicate it's disabled */
+            font-weight: bold;
+        }
+    </style>
+
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span> Pages
+                    <span></span> Account
+                </div>
+            </div>
+        </div>
+        <section class="pt-150 pb-150">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-10 m-auto">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="dashboard-menu">
+                                    <ul class="nav flex-column" role="tablist">
+                                    
+                                        <li class="nav-item">
+                                            <a class="nav-link active" id="orders-tab" data-bs-toggle="tab" href="#orders"
+                                                role="tab" aria-controls="orders" aria-selected="false"><i
+                                                    class="fi-rs-shopping-bag mr-10"></i>Orders</a>
+                                        </li>
+                                      
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address"
+                                                role="tab" aria-controls="address" aria-selected="true"><i
+                                                    class="fi-rs-marker mr-10"></i>My Address</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab"
+                                                href="#account-detail" role="tab" aria-controls="account-detail"
+                                                aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab"
+                                                href="#Referral" role="tab" aria-controls="track-orders"
+                                                aria-selected="false"><i
+                                                    class="fi-rs-shopping-cart-check mr-10"></i>Refferal Code</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="tab-content dashboard-content">
+                                   
+                                    <div class="tab-pane fade active show" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Your Orders</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Order Id</th>
+                                                                <th>Date</th>
+                                                                <th>Order Status</th>
+                                                                <th>Payment Status</th>
+                                                                <th>Total</th>
+                                                                <th>Actions</th>
+                                                                <th>RePay</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            <% if (orders) { %>
+                                                                <% orders.forEach(order=> { %>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <%= order.transactionId %>
+                                                                        </td>
+                                                                        <td>
+                                                                            <%= new
+                                                                                Date(order.createdAt).toLocaleString()
+                                                                                %>
+                                                                        </td>
+                                                                        <td>
+                                                                            <%= order.orderStatus %>
+                                                                        </td>
+                                                                        <td>
+                                                                            <%= order.paymentStatus %>
+                                                                        </td>
+                                                                        <td>
+                                                                            <%= order.totalPrice %>
+                                                                        </td>
+
+                                                                        <td><a href="/orderDetails/<%= order._id %>"
+                                                                                class="btn-small d-block">View</a></td>
+
+                                                                        <!-- RePay Button for Failed Payment --->
+                                                                        <% if (order.paymentStatus==="Pending" && order.paymentMethod !=="COD" &&
+                                                                            order.orderStatus !=="Cancelled" ) { %>
+                                                                            <td>
+                                                                                <% if (userAddress) { %>
+                                                                                    <button class="repay-btn" id="RePay"
+                                                                                        onclick='RepayFailedOrder("<%= order._id %>", "<%= order.finalPrice %>", "<%= order.paymentMethod %>", "<%= order.address %>", "<%= order.couponCode %>", "<%= order.deliveryMethod %>")'>RePay</button>
+                                                                                    <% } %>
+                                                                            </td>
+
+                                                                            <% } %>
+
+                                                                                <!-- Red Button for Cancelled Orders -->
+                                                                                <% if (order.paymentStatus==="Pending"
+                                                                                    && order.orderStatus==="Cancelled" )
+                                                                                    { %>
+                                                                                    <td>
+                                                                                        <button
+                                                                                            class="repay-btn faded-btn"
+                                                                                            disabled>Repay</button>
+                                                                                    </td>
+
+                                                                                    <% } %>
+                                                                    </tr>
+                                                                    <% }) %>
+                                                                        <% } else { %>
+                                                                            <div>Empty... Please purchase anything...
+                                                                            </div>
+                                                                            <% } %>
+                                                        </tbody>
+
+
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--pagination-->
+                                        <div class="pagination-container">
+                                            <ul class="pagination">
+                                                <%if(currentPage> 1){%>
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page=1">First</a>
+                                                    </li>
+                                                    <li class="page-item">
+                                                        <a class="page-link"
+                                                            href="?page=<%= currentPage - 1%>">Previous</a>
+                                                    </li>
+                                                    <%}%>
+                                                        <%for(let i=1;i<=totalPages;i++){%>
+                                                            <li
+                                                                class="page-item <%= currentPage === i ? 'active' : ''%>">
+                                                                <a class="page-link" href="?page=<%= i %>">
+                                                                    <%= i %>
+                                                                </a>
+                                                            </li>
+                                                            <%}%>
+                                                                <%if(currentPage <=totalPages){%>
+                                                                    <li class="page-item">
+                                                                        <a class="page-link"
+                                                                            href="?page=<%= currentPage + 1 %>">Next</a>
+                                                                    </li>
+                                                                    <li class="page-item">
+                                                                        <a class="page-link"
+                                                                            href="?page=<%= totalPages %>">Last</a>
+                                                                    </li>
+                                                                    <%}%>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                  
+                                    <div class="tab-pane fade" id="address" role="tabpanel"
+                                        aria-labelledby="address-tab">
+                                        <div class="row">
+
+                                            <%if(userAddress){%>
+                                                <% userAddress.address.forEach((address)=>{%>
+                                                    <div class="col-lg-6">
+                                                        <div class="card mb-3 mb-lg-0">
+                                                            <div class="card-header">
+                                                                <h5 class="mb-0">
+                                                                    <%=address.addressType%>
+                                                                </h5>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <address>
+                                                                    <%=address.name%><br>
+                                                                        <%=address.city%> ,<br>
+                                                                            <%=address.landMark%>.
+                                                                                <br>
+                                                                                <%=address.pincode%>,<br>
+                                                                                    <%=address.phone%>
+                                                                </address>
+                                                                <p>
+                                                                    <%=address.state%>
+                                                                </p>
+                                                                <div class="d-flex justify-content-between">
+                                                                    <a href="/editAddress?id=<%=address._id%>"
+                                                                        class="btn-small">Edit</a>
+                                                                    <a href="/deleteAddress?id=<%=address._id%>"
+                                                                        class="btn-small">Delete</a>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <%})%>
+                                                        <%} else {%>
+                                                            <div class="col-lg-6">
+                                                                <div class="card">
+                                                                    <div class="card-header">
+                                                                        <h5 class="mb-0"></h5>
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        <address>
+                                                                            No Address..
+                                                                        </address>
+                                                                        <p></p>
+                                                                        <a href="#" class="btn-small"></a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <%}%>
+                                        </div>
+                                        <div class="form-group col-md-12">
+                                            <a href="/addAddress?redirectTo=userProfile" class="btn btn-link"
+                                                style="text-decoration: none;">
+                                                Add Address
+                                            </a>
+
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="account-detail" role="tabpanel"
+                                        aria-labelledby="account-detail-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5>Account Details</h5>
+                                            </div>
+                                            <div class="card-body">
+
+                                                <form method="post" name="enq" action="/profileUpdate">
+                                                    <div class="row">
+                                                        <div class="form-group col-md-6">
+                                                            <label>First Name <span class="required">*</span></label>
+                                                            <input required="" class="form-control square" name="name"
+                                                                type="text" value="<%=user.name%>">
+                                                        </div>
+
+                                                        <div class="form-group col-md-12">
+                                                            <label>Phone<span class="required">*</span></label>
+                                                            <input required="" class="form-control square" name="phone"
+                                                                type="text" value="<%=user.phone%>">
+                                                        </div>
+                                                        <div class="form-group col-md-12">
+                                                            <label>Email Address <span class="required">*</span></label>
+                                                            <input required="" class="form-control square" name="email"
+                                                                type="email" value="<%=user.email%>" readonly>
+                                                        </div>
+
+                                                        <div class="form-group col-md-12">
+                                                            <a href="/change-password" class="btn btn-link"
+                                                                style="text-decoration: none;">
+                                                                Change Password
+                                                            </a>
+                                                        </div>
+
+
+                                                        <div class="col-md-12">
+                                                            <button type="submit" class="btn btn-fill-out submit"
+                                                                name="submit" value="Submit">Save</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="Referral" role="tabpanel"
+                                        aria-labelledby="referral-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Create Referral Code</h5>
+                                            </div>
+                                            <div class="card-body contact-from-area">
+                                                <p>Create a referral code to offer discounts to users. Fill in the
+                                                    details below and click "Create Referral" to generate a new code.
+                                                </p>
+                                                <div class="row">
+                                                    <div class="col-lg-8">
+                                                        <!-- Form for Creating Referral Code -->
+                                                        <%if(user.referalCode == null){%>
+                                                        <form id="referralForm" class="contact-form-style mt-30 mb-50">
+                                                            <!-- Referral Name -->
+                                                            <div class="input-style mb-20">
+                                                                <label>Referral Name</label>
+                                                                <input id="referralName" name="name"
+                                                                    placeholder="Enter a name for the referral code (e.g., SUMMER2025)"
+                                                                    type="text" class="square" required>
+                                                            </div>
+
+                                                            <!-- Submit Button -->
+                                                            <button class="submit submit-auto-width" type="submit"
+                                                                onclick="createRefferal(event)">Create Referral</button>
+                                                        </form>
+                                                    <%}%>
+                                                        <% if(user.referalCode !==null){%>
+                                                            <span>REFERRAL CODE : </span>
+                                                            <strong style="color: rgb(19, 18, 18);">
+                                                                <%= user.referalCode %>
+                                                            </strong>
+                                                            <button class="btn "
+                                                                onclick="copyReferralCode('<%= user.referalCode %>')">
+                                                                Copy
+                                                            </button>
+                                                            <%}else{%>
+                                                                <label>Oops No Refferal Code is Found, Create a New
+                                                                    One...</label>
+                                                                <%}%>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <%- include("../../views/partials/user/footer") %>
+
+        <script>
+
+            // Referral code generating function
+            async function createRefferal(event) {
+                event.preventDefault();
+
+                const name = document.getElementById("referralName").value;
+
+                if (!name) {
+                    alert("Please enter a referral Name..!");
+                    return;
+                }
+
+                try {
+                    const response = await fetch("/GenerateReferral", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ name })
+                    });
+
+                    const result = await response.json();
+                    console.log("Response:", result);
+
+                    if (result.success) {
+                        Swal.fire({
+                            title: "Success.",
+                            text: "Referral Code Generated Successfully",
+                            icon: "success",
+                        })
+                            .then(() => location.reload())
+                    } else {
+                        Swal.fire({
+                            title: "Error..!",
+                            text: "Error in Creating Referral Code..!",
+                            icon: "error",
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error in creating referral code", error);
+                    Swal.fire({
+                        title: "Error..!",
+                        text: "An error occurred while creating referral code. Please try again later.",
+                        icon: "error",
+                    });
+                }
+            }
+
+
+            // Function to copy the referral code
+            function copyReferralCode(code) {
+                // Create a temporary input element to copy text
+                const tempInput = document.createElement('input');
+                tempInput.value = code;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                tempInput.setSelectionRange(0, 99999); // For mobile devices
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+
+                Swal.fire({
+                    title: "Coupon code copied",
+                    text: "Code : " + code,
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1000
+                })
+            }
+
+
+        </script>
+
+        <script>
+
+
+
+async function RepayFailedOrder(orderId, totalAmount, paymentMethod, addressId, couponCode, deliveryMethod) {
+    console.log("Repaying Order:", orderId, totalAmount, paymentMethod, addressId, couponCode, deliveryMethod);
+
+    try {
+        const response = await fetch("/placeOrderRazorPay", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ totalAmount, addressId, orderId }),  
+        });
+
+        const data = await response.json();
+        console.log("Razorpay Order Data:", data);
+
+        if (data.success) {
+            const { razorpayOrderId, amount, currency, key } = data; 
+             console.log("ffff",razorpayOrderId);
+            const options = {
+                key,
+                amount,
+                currency,
+                name: "Gym Buddy",
+                description: "Order Payment",
+                order_id: razorpayOrderId, 
+                handler: async function (response) {
+                    console.log("Razorpay Payment Response:", response);
+
+                    const paymentId = response.razorpay_payment_id;
+                    const razorpaySignature = response.razorpay_signature;
+
+                    console.log("sig",razorpaySignature)
+
+                    
+                    const verifyResponse = await fetch("/verifyRazorPayOrder", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            orderId, 
+                            addressId, 
+                            paymentMethod, 
+                            deliveryMethod, 
+                            couponCode,
+                            paymentId,
+                            razorpaySignature
+                        }),
+                    });
+
+                    const verifyData = await verifyResponse.json();
+                    console.log("Verify Payment Response:", verifyData);
+
+                    if (verifyData.success) {
+                        Swal.fire({
+                            title: "Payment Successful",
+                            text: `Order Repayment Successful. Your Order ID: ${verifyData.orderId}`,
+                            icon: "success",
+                            confirmButtonText: "OK",
+                        }).then(() => window.location.reload());
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Payment Failed",
+                            text: "Payment verification failed. Please try again.",
+                            confirmButtonText: "OK",
+                        });
+                    }
+                },
+                theme: { color: "#3399cc" },
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: data.message,
+                confirmButtonText: "OK",
+            });
+        }
+    } catch (error) {
+        console.error("RePay Error:", error);
+    }
+}
+
+
+
+        </script>

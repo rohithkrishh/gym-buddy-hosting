@@ -1,0 +1,378 @@
+<%- include("../../views/partials/admin/header") %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .dashboard-title {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        .select-filter {
+            width: 25%;
+        }
+        table th, table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 12px;
+        }
+        table thead {
+            background-color: #007bff;
+            color: white;
+        }
+        table tbody tr:nth-child(even) {
+            background-color: #f1f1f1;
+        }
+        table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+        .round-img {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+        }
+        .badge {
+            font-size: 14px;
+        }
+
+        .table {
+            border-collapse: separate;
+            border-spacing: 0 15px;
+            margin-top: -15px;
+        }
+
+        .table thead th {
+            border-bottom: none;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .table tbody tr {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .table tbody td {
+            background-color: #ffffff;
+            padding: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .table tbody td:first-child {
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .table tbody td:last-child {
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+
+        .round-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 20px;
+        }
+
+        .bg-primary {
+            background-color: #4e73df !important;
+        }
+
+        .bg-success {
+            background-color: #1cc88a !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <!-- Dashboard Title -->
+    <h1 class="dashboard-title text-center">Admin Dashboard</h1>
+
+    <!-- Chart Section -->
+    <div class="row mb-4">
+        <!-- Sales Overview Chart -->
+        <div class="col-lg-6">
+            <div class="card p-4">
+                <h4>Product Sales Overview</h4>
+                <div class="chart-container">
+                    <canvas id="productChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Sales Flow Chart -->
+        <div class="col-lg-6">
+            <div class="card p-4">
+                <h4>Category Sales Overview</h4>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Dropdown -->
+    <div class="d-flex justify-content-end mb-4">
+        <select class="form-select select-filter" aria-label="Filter by" id="filter-data" onchange="filterData()">
+            <option value="default">Default</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select>
+    </div>
+
+    <!-- Best Selling Products Section -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card p-4">
+                <h4>Top 10 Best Selling Products</h4>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">No</th>
+                            <th scope="col">Image</th>
+                            <th scope="col">Product</th>
+                            <th scope="col">Sold Count</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productList">
+                        <% if (product) { %> 
+                            <% product.forEach((item, index) => { %>   
+                                <tr>
+                                    <td><%= index + 1 %></td>
+                                    <td>
+                                        <img src="/assets/login/<%= item.productImage %>" alt="img" class="round-img">
+                                    </td>
+                                    <td>  
+                                        <%= item.productName %>
+                                    </td>
+                                    <td><span class="badge bg-primary rounded-pill"><%= item.totalOrder %> Items SOLD</span></td>
+                                </tr>
+                            <% }) %> 
+                        <% } %>    
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Best Selling Categories Section -->
+        <div class="col-lg-6">
+            <div class="card p-4">
+                <h4>Top Best Selling Categories</h4>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">No</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Sold Count</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoryList">
+                        <% if (category) { %>
+                            <% category.forEach((cat, index) => { %>   
+                                <tr>
+                                    <td><%= index + 1 %></td>
+                                    <td><%= cat.categoryName %></td>
+                                    <td><span class="badge bg-success rounded-pill"><%= cat.totalOrder %> Items SOLD</span></td>
+                                </tr>
+                            <% }) %> 
+                        <% } %>    
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap and Chart.js Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+<script>
+    // store dynamic chart values from the backend
+    const productData = <%- JSON.stringify(productData) %>;
+    const categoryData = <%- JSON.stringify(categoryData)%>;
+
+    console.log("----",productData);
+    // product chart data dynamically
+    const ctx = document.getElementById('productChart').getContext('2d');
+
+    // Create a new Chart.js instance with backend data
+    const productChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: productData.map(item => item.productName),  // Product names 
+            datasets: [{
+                label: 'Sales',
+                data: productData.map(item => item.totalOrders),  
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // category chart data dynamically
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    const categoryChart = new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: categoryData.map(item => item.categoryName), 
+            datasets: [{
+                label: 'Category Sales',
+                data: categoryData.map(item => item.totalOrder),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+</script>
+
+
+<!-- function to filter data -->
+<script>
+    async function filterData(){
+        const filterValue = document.getElementById("filter-data").value;
+        console.log("type:",filterValue)
+        try {
+            const response = await fetch(`/admin/filterData?filterValue=${filterValue}`)
+
+            const data = await response.json()
+            console.log("data:",data)
+
+            if(data.products){
+                const productList = document.querySelector("#productList")
+                productList.innerHTML="" ;
+
+                // update products data
+                data.products.forEach((pro,index)=>{
+                    productList.insertAdjacentHTML(
+                        "beforeend",
+                    `   <tr>
+                            <td>${index + 1}</td>
+                            <td>
+                                <img src="/assets/login/${encodeURIComponent(pro.productImage)}" alt="img" class="round-img">
+                            </td>
+                            <td>${pro.productName}</td>
+                            <td><span class="badge bg-primary rounded-pill">${pro.totalOrder} Items SOLD</span></td>
+                         </tr>
+                    `);
+                });
+
+                // update category data
+                const categoryList = document.querySelector("#categoryList")
+                categoryList.innerHTML ="" ;
+
+                data.categories.forEach((cat,index)=>{
+                    categoryList.insertAdjacentHTML(
+                        "beforeend",
+                    `<tr>
+                        <td>${index +1}</td>
+                        <td>${cat.categoryName}</td>
+                        <td><span class="badge bg-success rounded-pill">${cat.totalOrder} Items SOLD</span></td>
+                    </tr>
+                    `);
+                });
+
+                //update chart data
+                productChartData(data.productData)
+                categoryChartData(data.categoryData)
+
+            }
+        } catch (error) {
+            console.error('Error in fetching filter data product and category',error);
+        }
+    }
+
+    // update product chart
+    function productChartData(productData){
+        productChart.data.labels = productData.map(item => item.productName);
+        productChart.data.datasets[0].data = productData.map(item => item.totalOrder);
+
+        productChart.update()
+    }
+
+    // update category chart
+    function categoryChartData(categoryData){
+        categoryChart.data.labels = categoryData.map(item => item.categoryName);
+        categoryChart.data.datasets[0].data = categoryData.map(item => item.totalOrder);
+
+        categoryChart.update()
+    }
+</script>
+
+</body>
+</html>
+
+
+<%- include("../../views/partials/admin/footer") %>

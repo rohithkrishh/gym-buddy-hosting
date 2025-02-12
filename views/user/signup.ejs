@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centered Signup Page</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <style>
+    .error-message {
+      color: red;
+      font-size: 0.9em;
+      margin-top: 5px;
+      display: none;
+    }
+    .error {
+      border-color: red !important;
+    }
+    .valid {
+      border-color: green !important;
+    }
+    body {
+  background-image: url('/assets/imgs/page/dumbal image.jpg'); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+  </style>
+</head>
+<body>
+  <div class="signup-wrapper">
+
+    <!-- Signup Card -->
+    <div class="signup-card d-flex">
+      <!-- Form Section -->
+      <div class="form-section">
+        <h1>Sign Up</h1>
+        <form id="signupForm" method="post" action="/signup">
+
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" placeholder="Enter Name" class="form-control">
+          <div class="error-message" id="nameError">Full name must be at least 3 characters long.</div>
+
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="Enter Email" class="form-control">
+          <div class="error-message" id="emailError">Please enter a valid email address.</div>
+
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" placeholder="Enter Phone Number" class="form-control">
+          <div class="error-message" id="phoneError">Please enter a valid 10-digit phone number.</div>
+
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Password" class="form-control">
+          <div class="error-message" id="passwordError">Password must be at least 6 characters, contain one uppercase letter, and one number.</div>
+
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" class="form-control">
+          <div class="error-message" id="confirmPasswordError">Passwords do not match.</div>
+
+          <div class="mb-2">
+            <input type="checkbox" id="showReferal" onclick="toggleReferalCode()">
+            <label for="showReferal">Have a Referral Code?</label>
+          </div>
+
+          <div class="mb-2" id="referalField" style="display: none;">
+            <input type="text" class="form-control" id="referralCode" name="referalCode"
+              placeholder="Referral Code">
+            <div id="error5" class="error-message"></div>
+          </div>
+
+          <%if(locals.message && message.length > 0) { %>
+          <div class="alert alert-danger text-center">
+            <%= message %>
+          </div>
+          <% } %>
+
+          <button type="submit" class="btn btn-primary mt-3">Sign Up</button>
+        </form>
+
+        <!-- Google Signup -->
+        <div class="google-signup mt-3">
+          <span>or sign up with</span>
+          <a href="/google" onclick="googleSignup()">
+            <img src="/assets/login/google-logo.png" alt="Google Icon">
+          </a>
+        </div>
+
+        <!-- Already Registered -->
+        <p>Already registered? <a href="/login">Log in</a></p>
+      </div>
+
+      <!-- Image Section -->
+      <div class="image-section">
+        <img src="/assets/imgs/page/dumbal image.jpg" alt="Gym Equipment">
+      </div>
+    </div>
+  </div>
+
+<!-- Referralcode toggle -->
+
+<script>
+  function toggleReferalCode() {
+    const referalField = document.getElementById('referalField');
+    const checkbox = document.getElementById('showReferal');
+
+    if (checkbox.checked) {
+      referalField.style.display = 'block';
+    } else {
+      referalField.style.display = 'none';
+    }
+  }
+</script>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("signupForm");
+
+      const nameInput = document.getElementById("name");
+      const emailInput = document.getElementById("email");
+      const phoneInput = document.getElementById("phone");
+      const passwordInput = document.getElementById("password");
+      const confirmPasswordInput = document.getElementById("confirmPassword");
+
+      const nameError = document.getElementById("nameError");
+      const emailError = document.getElementById("emailError");
+      const phoneError = document.getElementById("phoneError");
+      const passwordError = document.getElementById("passwordError");
+      const confirmPasswordError = document.getElementById("confirmPasswordError");
+
+      const validateField = (input, condition, errorElement, errorMessage) => {
+        if (condition) {
+          input.classList.add("valid");
+          input.classList.remove("error");
+          errorElement.style.display = "none";
+        } else {
+          input.classList.add("error");
+          input.classList.remove("valid");
+          errorElement.textContent = errorMessage;
+          errorElement.style.display = "block";
+        }
+      };
+
+      
+    nameInput.addEventListener("input", () => {
+    const trimmedValue = nameInput.value.trim();
+    console.log(`Original: "${nameInput.value}", Trimmed: "${trimmedValue}"`);
+    validateField(nameInput, trimmedValue.length >= 3, nameError, "Full name must be at least 3 characters long.");
+  });
+
+      emailInput.addEventListener("input", () => {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        validateField(emailInput, emailPattern.test(emailInput.value.trim()), emailError, "Please enter a valid email address.");
+      });
+
+      phoneInput.addEventListener("input", () => {
+        const phonePattern = /^[0-9]{10}$/;
+        validateField(phoneInput, phonePattern.test(phoneInput.value.trim()), phoneError, "Please enter a valid 10-digit phone number.");
+      });
+
+      passwordInput.addEventListener("input", () => {
+        const password = passwordInput.value;
+        const isValid = password.length >= 6 && /[A-Z]/.test(password) && /[0-9]/.test(password);
+        validateField(passwordInput, isValid, passwordError, "Password must be at least 6 characters, contain one uppercase letter, and one number.");
+      });
+
+      confirmPasswordInput.addEventListener("input", () => {
+        validateField(confirmPasswordInput, passwordInput.value === confirmPasswordInput.value, confirmPasswordError, "Passwords do not match.");
+      });
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        nameInput.dispatchEvent(new Event("input"));
+        emailInput.dispatchEvent(new Event("input"));
+        phoneInput.dispatchEvent(new Event("input"));
+        passwordInput.dispatchEvent(new Event("input"));
+        confirmPasswordInput.dispatchEvent(new Event("input"));
+
+        if (!document.querySelector(".error")) {
+          form.submit(); 
+        }
+      });
+    });
+  </script>
+
+  
+</body>
+</html>

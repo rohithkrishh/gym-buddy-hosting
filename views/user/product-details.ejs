@@ -1,0 +1,604 @@
+<%- include("../../views/partials/user/header") %>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <style>
+        .ProductContainer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-top: 5%;
+        }
+
+        .product-detail {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .product-images {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .main-image-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            padding-top: 100%;
+            /* 1:1 Aspect Ratio */
+        }
+
+        .main-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .thumbnail-strip {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .thumbnail.active {
+            border-color: #007bff;
+        }
+
+        .product-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .rating {
+            color: #ffc107;
+            font-size: 20px;
+        }
+
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            margin: 10px 0;
+        }
+
+        .old-price {
+            text-decoration: line-through;
+            color: #6c757d;
+            margin-left: 10px;
+        }
+
+        .quantity {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .quantity button {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .quantity span {
+            padding: 5px 15px;
+            border-top: 1px solid #ced4da;
+            border-bottom: 1px solid #ced4da;
+        }
+
+        .add-to-cart {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .add-to-cart:hover {
+            background-color: #0056b3;
+        }
+
+        .product-meta {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .material-filter li {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .material-filter li a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .material-filter li.active a {
+            color: #ff4500;
+            /* Highlight the selected material */
+            font-weight: bold;
+        }
+    </style>
+    <main class="main">
+
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span> <a href="/shoppingPage">shop</a>
+                    <span></span>
+                    <%= product.productName %>
+                </div>
+            </div>
+        </div>
+       
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="ProductContainer">
+                        <div class="product-detail">
+                            <div class="product-images">
+                                <div class="main-image-container" onmousemove="zoomImage(event)" onmouseleave="resetZoom(event)">
+                                    <img id="mainImage" src="/assets/login/<%= product.productImages[0] %>" alt="Product Image" class="main-image">
+                                </div>
+                                <div class="thumbnail-strip">
+                                    <% for (let i = 0; i < product.productImages.length; i++) { %>
+                                        <div>
+                                            <img src="/assets/login/<%= product.productImages[i] %>" alt="Product Thumbnail <%= i + 1 %>" class="thumbnail active" onclick="changeImage(this)">
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12 col-xs-12">
+                                <div class="detail-info">
+                                    <h2 class="title-detail">
+                                        <%= product.productName %>
+                                    </h2>
+                                    <div class="product-detail-rating">
+                                        <div class="pro-details-brand">
+                                            <span>Category: <a href="shop-grid-right.html"><%= category.name %></a></span>
+                                        </div>
+                                    </div>
+                                    <!-- Dynamic Price and Offer -->
+                                    <div class="clearfix product-price-cover">
+                                        <div class="product-price primary-color float-left">
+                                            <ins>
+                                                <span class="text-brand" id="dynamic-price">
+                                                    ₹<%= product.variants[0].salePrice.toFixed() %>
+                                                </span>
+                                            </ins>
+                                            <ins>
+                                                <span class="old-price font-md ml-15" id="dynamic-regular-price">
+                                                    ₹<%= product.variants[0].regularPrice %>
+                                                </span>
+                                            </ins>
+                                            <% if (highestOffer) { %>
+                                                <span class="save-price font-md color3 ml-15">
+                                                    <%= highestOffer %>% Off
+                                                </span>
+                                            <% } %>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="bt-1 border-color-1 mt-15 mb-15"></div>
+                                    <div class="short-desc mb-30">
+                                        <p><%= product.description %></p>
+                                    </div>
+        
+                                    <!-- Variant Selector -->
+                                    <% if (product.variants && product.variants.length > 0) { %>
+                                        <div class="variant-selector mb-30">
+                                            <label for="variant-select"><strong>Select Variant:</strong></label>
+                                            <select id="variant-select" class="form-select" onchange="updateVariantDetails()">
+                                                <% product.variants.forEach((variant, index) => { %>
+                                                    <option value="<%= index %>" <%= variant.stock <= 0 ? 'disabled' : '' %>>
+                                                        <% if (variant.categoryType === 'strength') { %>
+                                                            Weight: <%= variant.weight %> kg
+                                                        <% } else if (variant.categoryType === 'cardio') { %>
+                                                            Type: <%= variant.type %>
+                                                        <% } %>
+                                                        (Stock: <%= variant.stock %>)
+                                                    </option>
+                                                <% }); %>
+                                            </select>
+                                        </div>
+                                    <% } %>
+        
+                                    <!-- Stock and Availability -->
+                                    <ul class="product-meta font-xs color-grey mt-50">
+                                        <li class="mb-5">SKU: <span id="dynamic-sku"><%= product.variants[0]?.sku || 'N/A' %></span></li>
+                                        <li>Availability: <span id="dynamic-stock" class="in-stock text-success ml-5">
+                                            <%= product.variants[0]?.stock || 0 %> Items In Stock
+                                        </span></li>
+                                    </ul>
+        
+                                    <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+        
+                                    <div class="detail-extralink">
+                                        <% if (product.variants.length) { %>
+                                            <form id="add-to-cart-form">
+                                                <input type="hidden" name="productId" value="<%= product._id %>">
+                                                <input type="hidden" name="variantId" id="variantId" value="<%= product.variants[0]?._id || '' %>">
+                                                <input type="number" name="quantity" value="1" min="1" id="quantity-input" required>
+                                                <button type="button" class="button mt-5 button-add-to-cart" id="addToCartBtn">Add to Cart</button>
+                                            </form>
+                                        <% } else { %>
+                                            <button class="button button-add-to-cart" disabled>Out of Stock</button>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+
+        <div class="row">
+            <div class="col-lg-10 m-auto entry-main-content">
+
+                <h3 class="section-title style-1 mb-30 mt-30">Reviews (3)</h3>
+                <!--Comments-->
+                <div class="comments-area style-2">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <h4 class="mb-30">Customer questions & answers</h4>
+                            <div class="comment-list">
+                                <div class="single-comment justify-content-between d-flex">
+                                    <div class="user justify-content-between d-flex">
+                                        <div class="thumb text-center">
+                                            <img src="assets/imgs/page/avatar-6.jpg" alt="">
+                                            <h6><a href="#">Jacky Chan</a></h6>
+                                            <p class="font-xxs">Since 2012</p>
+                                        </div>
+                                        <div class="desc">
+                                            <div class="product-rate d-inline-block">
+                                                <div class="product-rating" style="width:90%">
+                                                </div>
+                                            </div>
+                                            <p>Thank you very fast shipping from Poland only 3days.</p>
+                                            <div class="d-flex justify-content-between">
+                                                <div class="d-flex align-items-center">
+                                                    <p class="font-xs mr-30">December 4, 2020 at 3:12 pm </p>
+                                                    <a href="#" class="text-brand btn-reply">Reply <i
+                                                            class="fi-rs-arrow-right"></i> </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--single-comment -->
+                                <div class="single-comment justify-content-between d-flex">
+                                    <div class="user justify-content-between d-flex">
+                                        <div class="thumb text-center">
+                                            <img src="assets/imgs/page/avatar-7.jpg" alt="">
+                                            <h6><a href="#">Ana Rosie</a></h6>
+                                            <p class="font-xxs">Since 2008</p>
+                                        </div>
+                                        <div class="desc">
+                                            <div class="product-rate d-inline-block">
+                                                <div class="product-rating" style="width:90%">
+                                                </div>
+                                            </div>
+                                            <p>Great low price and works well.</p>
+                                            <div class="d-flex justify-content-between">
+                                                <div class="d-flex align-items-center">
+                                                    <p class="font-xs mr-30">December 4, 2020 at 3:12 pm </p>
+                                                    <a href="#" class="text-brand btn-reply">Reply <i
+                                                            class="fi-rs-arrow-right"></i> </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--single-comment -->
+                                <div class="single-comment justify-content-between d-flex">
+                                    <div class="user justify-content-between d-flex">
+                                        <div class="thumb text-center">
+                                            <img src="assets/imgs/page/avatar-8.jpg" alt="">
+                                            <h6><a href="#">Steven Keny</a></h6>
+                                            <p class="font-xxs">Since 2010</p>
+                                        </div>
+                                        <div class="desc">
+                                            <div class="product-rate d-inline-block">
+                                                <div class="product-rating" style="width:90%">
+                                                </div>
+                                            </div>
+                                            <p>Authentic and Beautiful, Love these way more than ever expected
+                                                They are Great earphones</p>
+                                            <div class="d-flex justify-content-between">
+                                                <div class="d-flex align-items-center">
+                                                    <p class="font-xs mr-30">December 4, 2020 at 3:12 pm </p>
+                                                    <a href="#" class="text-brand btn-reply">Reply <i
+                                                            class="fi-rs-arrow-right"></i> </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--single-comment -->
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <h4 class="mb-30">Customer reviews</h4>
+                            <div class="d-flex mb-30">
+                                <div class="product-rate d-inline-block mr-15">
+                                    <div class="product-rating" style="width:90%">
+                                    </div>
+                                </div>
+                                <h6>4.8 out of 5</h6>
+                            </div>
+                            <div class="progress">
+                                <span>5 star</span>
+                                <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50"
+                                    aria-valuemin="0" aria-valuemax="100">50%</div>
+                            </div>
+                            <div class="progress">
+                                <span>4 star</span>
+                                <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25"
+                                    aria-valuemin="0" aria-valuemax="100">25%</div>
+                            </div>
+                            <div class="progress">
+                                <span>3 star</span>
+                                <div class="progress-bar" role="progressbar" style="width: 45%;" aria-valuenow="45"
+                                    aria-valuemin="0" aria-valuemax="100">45%</div>
+                            </div>
+                            <div class="progress">
+                                <span>2 star</span>
+                                <div class="progress-bar" role="progressbar" style="width: 65%;" aria-valuenow="65"
+                                    aria-valuemin="0" aria-valuemax="100">65%</div>
+                            </div>
+                            <div class="progress mb-30">
+                                <span>1 star</span>
+                                <div class="progress-bar" role="progressbar" style="width: 85%;" aria-valuenow="85"
+                                    aria-valuemin="0" aria-valuemax="100">85%</div>
+                            </div>
+                            <a href="#" class="font-xs text-muted">How are ratings calculated?</a>
+                        </div>
+                    </div>
+                </div>
+                <!--comment form-->
+                <div class="comment-form">
+                    <h4 class="mb-15">Add a review</h4>
+                    <div class="product-rate d-inline-block mb-30">
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-8 col-md-12">
+                            <form class="form-contact comment_form" action="#" id="commentForm">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <textarea class="form-control w-100" name="comment" id="comment" cols="30"
+                                                rows="9" placeholder="Write Comment"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <input class="form-control" name="name" id="name" type="text"
+                                                placeholder="Name">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <input class="form-control" name="email" id="email" type="email"
+                                                placeholder="Email">
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <input class="form-control" name="website" id="website" type="text"
+                                                placeholder="Website">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="button button-contactForm">Submit
+                                        Review</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+        </div>
+        <div class="banner-img banner-big wow fadeIn f-none animated mt-50">
+            <img class="border-radius-10" src="assets/imgs/banner/banner-4.webp" alt="">
+            <div class="banner-text">
+                <!-- <h4 class="mb-15 mt-40">Repair Services</h4>
+                                    <h2 class="fw-600 mb-20">We're an Apple <br>Authorised Service Provider</h2> -->
+            </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </section>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+
+
+    document.getElementById('addToCartBtn').addEventListener('click', function () {
+    const variantSelect = document.getElementById('variant-select');
+    if (!variantSelect.value) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Please select a variant before adding to the cart.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+        });
+        return;
+    }
+
+    const form = document.getElementById('add-to-cart-form');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    fetch('/cart/addItem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    title: 'Success',
+                    text: 'Item added to cart',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                });
+
+               // Update stock dynamically
+                const selectedIndex = variantSelect.value;
+                const variants = <%- JSON.stringify(product.variants) %>;
+
+                variants[selectedIndex].stock -= parseInt(data.quantity, 10);
+                // document.getElementById('dynamic-stock').innerText = `${variants[selectedIndex].stock} Items In Stock`;
+
+                // Reset quantity input
+                document.getElementById('quantity-input').value = 1;
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'An error occurred while adding the item to the cart.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+        });
+});
+
+
+
+
+        function changeImage(thumbnail) {
+            const mainImage = document.getElementById('mainImage');
+            mainImage.src = thumbnail.src;
+            mainImage.alt = thumbnail.alt;
+
+            // Update active thumbnail
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            thumbnail.classList.add('active');
+        }
+
+        function changeQuantity(change) {
+            const quantityElement = document.getElementById('quantity');
+            let quantity = parseInt(quantityElement.textContent) + change;
+            quantity = Math.max(1, quantity); // Ensure quantity is at least 1
+            quantityElement.textContent = quantity;
+        }
+
+
+        function zoomImage(e) {
+            const image = e.target;
+            const zoomer = e.currentTarget;
+            const x = e.offsetX / zoomer.offsetWidth;
+            const y = e.offsetY / zoomer.offsetHeight;
+            const zoomLevel = 2;
+
+            image.style.transformOrigin = `${x * 100}% ${y * 100}%`; // Corrected template literal
+            image.style.transform = `scale(${zoomLevel})`; // Corrected template literal
+        }
+
+
+        function resetZoom(e) {
+            console.log("mouse leaved");
+
+            const image = e.target;
+            image.style.transformOrigin = 'center center';
+            image.style.transform = 'scale(1)';
+        }
+
+  
+//     function updateVariantDetails() {
+//     const selectedVariantIndex = document.getElementById("variant-select").value;
+//     const variants = <%- JSON.stringify(product.variants) %>;
+
+//     const selectedVariant = variants[selectedVariantIndex];
+//     if (selectedVariant) {
+//         document.getElementById("dynamic-price").innerText = `₹${selectedVariant.price}`;
+//         document.getElementById("dynamic-stock").innerText = `${selectedVariant.stock} Items In Stock`;
+//         document.getElementById("dynamic-sku").innerText = selectedVariant.sku;
+
+//         // Update the variantId in the hidden input field
+//         document.getElementById("variantId").value = selectedVariant._id;
+//     }
+// }
+
+
+
+
+function updateVariantDetails() {
+    const selectedVariantIndex = document.getElementById("variant-select").value;
+    const variants = <%- JSON.stringify(product.variants) %>;
+
+    const selectedVariant = variants[selectedVariantIndex];
+    if (selectedVariant) {
+        // Round the salePrice and regularPrice to the nearest integer
+        const roundedSalePrice = Math.round(selectedVariant.salePrice);
+        const roundedRegularPrice = Math.round(selectedVariant.regularPrice);
+
+        // Update salePrice
+        document.getElementById("dynamic-price").innerText = `₹${roundedSalePrice}`;
+
+        // Update regularPrice
+        document.getElementById("dynamic-regular-price").innerText = `₹${roundedRegularPrice}`;
+
+        // Update stock
+        document.getElementById("dynamic-stock").innerText = `${selectedVariant.stock} Items In Stock`;
+
+        // Update SKU
+        document.getElementById("dynamic-sku").innerText = selectedVariant.sku;
+
+        // Update the variantId in the hidden input field
+        document.getElementById("variantId").value = selectedVariant._id;
+    }
+}
+
+
+
+    </script>
+    <%- include("../../views/partials/user/footer") %>
