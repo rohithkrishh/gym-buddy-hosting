@@ -111,13 +111,10 @@
                                                 </div>
                                                 <!-- Quick View & Wishlist -->
                                                 <div class="product-action-1">
-                                                    <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal"
-                                                        data-bs-target="#quickViewModal" onclick="openQuickView('<%= products[i]._id %>')">
-                                                        <i class="fi-rs-search"></i>
-                                                    </a>
-                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up wishlist-btn"
-                                                        data-product-id="<%= products[i]._id %>">
-                                                        <i class="fi-rs-heart"></i>
+                                                   
+                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" 
+                                                       onclick="addToWishlist('<%= products[i]._id %>')">
+                                                       <i class="fi-rs-heart"></i>
                                                     </a>
                                                 </div>
                                                 <div class="product-badges product-badges-position product-badges-mrg">
@@ -169,11 +166,7 @@
                                                 </div>
                                     
                                                 <!-- Add to Cart -->
-                                                <div class="product-action-1 show">
-                                                    <a aria-label="Add To Cart" class="action-btn hover-up" href="#">
-                                                        <i class="fi-rs-shopping-bag-add" onclick="addToCart('<%= products[i]._id %>')"></i>
-                                                    </a>
-                                                </div>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -240,33 +233,7 @@
 </a>
 
 
-
-<!-- Price filter -->
-
-<!-- <div class="widget-category mb-30">
-    <h5 class="section-title style-1 mb-30 wow fadeIn animated">Filter by Price</h5>
-    
-    <form action="/filter" method="GET">
-        <input type="hidden" name="category" value="<%= selectedCategory || '' %>">
-        <input type="hidden" name="brand" value="<%= selectedBrand || '' %>">
-        <input type="hidden" name="sort" value="<%= selectedSort || '' %>">
-        
-        <div>
-            <label for="minPrice">Min Price:</label>
-            <input type="number" name="gt" id="minPrice" value="<%= selectedPrice ? selectedPrice.split('-')[0] : '' %>">
-        </div>
-        
-        <div>
-            <label for="maxPrice">Max Price:</label>
-            <input type="number" name="lt" id="maxPrice" value="<%= selectedPrice ? selectedPrice.split('-')[1] : '' %>">
-        </div>
-
-          <button type="submit">Apply</button>
-             </form>
-</div> -->
-                               
                 
-
         </section>
     </main>
 
@@ -298,40 +265,39 @@ document.addEventListener("DOMContentLoaded", function() {
 
             function addToWishlist(productId){
 
-                $.ajax({
-               url:'/addToWishlist',
-               method:'POST',
-               data:{productId:productId},
-               success:(response)=>{
-             if(response.status){
-                swal.fire({
-                    title:'Added to wishlist',
-                    text:response.message,
-                    icon:'success',
+                    $.ajax({
+                    url:'/addToWishlist',
+                    method:'POST',
+                    data:{productId:productId},
+                    success:(response)=>{
+                    if(response.status){
+                    swal.fire({
+                        title:'Added to wishlist',
+                        text:response.message,
+                        icon:'success',
+                        timer:2000
+                    })
+                    }else{
+                    swal.fire({
+                        title:'already in wishlist',
+                        text:response.message,
+                        icon:'info',
+                        timer:2000
+                    })
+                    }
+                    },
+                    error:(error)=>{
+                    swal.fire({
+                    title:'Error',
+                    text:'Error adding product to your wishlist',
+                    icon:'error',
                     timer:2000
-                })
-             }else{
-                swal.fire({
-                    title:'already in wishlist',
-                    text:response.message,
-                    icon:'info',
-                    timer:2000
-                })
-             }
-               },
-               error:(error)=>{
-                swal.fire({
-                title:'Error',
-                text:'Error adding product to your wishlist',
-                icon:'error',
-                timer:2000
-                })
-                
+                    })
 
-               }
-               
-                })
-            }
 
+                    }
+
+                 })
+                 }
 
         </script>

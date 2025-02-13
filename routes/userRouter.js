@@ -63,7 +63,7 @@ router.get("/reset-password",profileController.getResetPassPage);
 router.post("/resend-forgot-otp",profileController.resendOtp);
 router.post("/reset-password",profileController.postNewPassword);
 router.get("/userProfile",userAuth,profileController.userProfile);
-router.get("/change-email",profileController.changeEmail);
+router.get("/change-email",userAuth,profileController.changeEmail);
 router.get("/change-password",userAuth,profileController.changePassword);
 router.post("/change-password",userAuth,profileController.changePasswordValid);
 router.post("/verify-changepassword-otp",userAuth,profileController.verifyChangePassOtp);
@@ -108,14 +108,14 @@ router.post("/walletPlaceOrder",userAuth,walletController.walletPlaceOrder);
 
 
 //Whishlist Management
-router.get("/whishlist",WishlistController.LoadWishlist);
-router.post("/addToWishlist",WishlistController.addToWishlist);
+router.get("/whishlist",userAuth,WishlistController.LoadWishlist);
+router.post("/addToWishlist",userAuth,WishlistController.addToWishlist);
 
 //Coupon Management
-router.post("/apply-coupon",orderController.verifyCoupon);
+router.post("/apply-coupon",userAuth,orderController.verifyCoupon);
 
 
 //ProductDetails Management
-router.get("/productDetails",userController.productDetails);
+router.get("/productDetails",userAuth,userController.productDetails);
 
 module.exports=router

@@ -1,287 +1,274 @@
 <%- include("../../views/partials/user/header") %>
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <main class="main">
-        <div class="page-header breadcrumb-wrap">
-            <div class="container">
-                <div class="breadcrumb">
-                    <a href="index.html" rel="nofollow">Home</a>
-                    <span></span> <a href="/shoppingPage">shop</a>
-                </div>
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="/" rel="nofollow">Home</a>
+                <span></span> Shop
+                <span></span> Your Cart
             </div>
         </div>
-        <div class="header-middle header-middle-ptb-1 d-none d-lg-block">
-            <div class="container">
-                <div class="header-wrap">
-                    <div class="logo logo-width-1">
+    </div>
+    <section class="mt-50 mb-50">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <% if (cart.items.some(item => item.outOfStock)) { %>
+                        <div class="alert alert-danger text-center">
+                            Some items in your cart are out of stock. Please remove them to proceed to checkout.
+                        </div>
+                    <% } %>
+                    <div class="table-responsive">
+                        <table class="table shopping-summery text-center clean">
+                            <thead>
+                                <tr class="main-heading">
+                                    <th scope="col">Image</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Variant</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Subtotal</th>
+                                    <th scope="col">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (cart && cart.items.length > 0) { %>
+                                    <% cart.items.forEach((item) => { %>
+                                        <tr class="<%= item.outOfStock ? 'bg-light-danger' : '' %>">
+                                            <td class="image product-thumbnail">
+                                                <img src="/assets/login/<%= item.productImage[0] %>" alt="<%= item.name %>">
+                                            </td>
+                                            <td class="product-des product-name">
+                                                <h5><%= item.name %></h5>
+                                            </td>
+                                            <td class="variant">
+                                                <span>
+                                                    <%= item.variant ? (item.variant.type || item.variant.weight) : "Out of stock" %>
+                                                </span>
+                                            </td>
+                                            <td class="price" data-title="Price">
+                                                <% if (item.variant && item.variant.salePrice > 0) { %>
+                                                    ₹<%= Math.round(item.variant.salePrice) %>
+                                                <% } else { %>
+                                                    <span class="text-danger">Unavailable</span>
+                                                <% } %>
+                                            </td>
+                                            <td class="text-center" data-title="Stock">
+                                                <% if (!item.outOfStock) { %>
+                                                    <div class="detail-qty border radius m-auto">
+                                                        <a href="#" class="qty-down <%= item.quantity === 1 ? 'disabled' : '' %>"
+                                                            onclick="updateQuantity('<%= item.productId %>', '<%= item.variant.variantId %>', -1)">
+                                                            <i class="fi-rs-angle-small-down"></i>
+                                                        </a>
+                                                        <span class="qty-val" id="qty-<%= item.productId %>-<%= item.variant.variantId %>">
+                                                            <%= item.quantity %>
+                                                        </span>
+                                                        <a href="#" class="qty-up <%= item.variant.stock <= item.quantity ? 'disabled' : '' %>"
+                                                            onclick="updateQuantity('<%= item.productId %>', '<%= item.variant.variantId %>', +1)">
+                                                            <i class="fi-rs-angle-small-up"></i>
+                                                        </a>
+                                                    </div>
+                                                <% } else { %>
+                                                    <span class="text-danger">Out of Stock</span>
+                                                <% } %>
+                                            </td>
+                                            <td class="text-right" data-title="Cart">
+                                                <span id="subtotal-<%= item.productId %>-<%= item.variant.variantId %>">
+                                                    <% if (!item.outOfStock) { %>
+                                                        ₹<%= Math.round(item.quantity * item.variant.salePrice) %>
+                                                    <% } else { %>
+                                                        N/A
+                                                    <% } %>
+                                                </span>
+                                            </td>
+                                            <td class="action" data-title="Remove">
+                                                <a href="#" class="text-muted"
+                                                    onclick="removeFromCart('<%= item.productId %>', '<%= item.variant.variantId %>')">
+                                                    <i class="fi-rs-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="6" class="text-center">
+                                            <p>Your cart is empty.</p>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% if (cart && cart.items.length > 0) { %>
+                        <div class="cart-action text-end">
+                            <button id="checkout-btn" class="btn" 
+                                <% if (cart.items.some(item => item.outOfStock)) { %> 
+                                    disabled 
+                                <% } %> 
+                                onclick="proceedToCheckout()">
+                                <i class="fi-rs-box-alt mr-10"></i> Proceed To Checkout
+                            </button>
+                        </div>
+    
+                        <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
+                   
+                </div>
+
+                <!-- Cart Total -->
+
+                <div class="col-lg-6 col-md-12">
+                    <div class="border p-md-4 p-30 border-radius cart-totals">
+                        <div class="heading_s1 mb-3">
+                            <h4>Cart Totals</h4>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="cart_total_label">Total</td>
+                                        <td class="cart_total_amount" id="cartTotal"><strong><span
+                                                    class="font-xl fw-900 text-brand">₹ <%= cartTotal || null %>
+                                                        </span></strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <a href="/checkOut" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To
+                            Checkout</a>
 
                     </div>
-                    <div class="header-right">
-                        <div class="search-style-2">
-                            <form method="GET" action="/shop">
-                                <input 
-                                    type="text" 
-                                    name="searchWord" 
-                                    placeholder="Search products..." 
-                                   
-                                />
-                                <button type="submit">Search</button>
-                            </form>
-                            
-                            
-                        </div>
-                    </div>
                 </div>
+                <% } %>
             </div>
         </div>
-        <section class="mt-50 mb-50">
-            <div class="container">
-                <div class="row flex-row-reverse">
-                    <div class="col-lg-9">
-                        <div class="shop-product-fillter">
-
-                            <div class="totall-product">
-                                <p> We found <strong class="text-brand">
-                                        <%=products.length%>
-                                    </strong> items for you!</p>
-                            </div>
-
-                            <div class="sort-by-product-area">
-                                <div class="sort-by-cover mr-10">
-
-                                </div>
-
-                                <!-- filter based on price low to high --------->
-
-                                <div class="sort-by-cover">
-                                    <div class="sort-by-product-wrap">
-                                        <div class="sort-by">
-                                            <span><i class="fi-rs-apps-sort"></i>Sort by:</span>
-                                        </div>
-                                        <div class="sort-by-dropdown-wrap">
-                                            <span> Featured <i class="fi-rs-angle-small-down"></i></span>
-                                        </div>
-                                    </div>
-                                    <div class="sort-by-dropdown">
-                                        <ul>
-                                            <li><a class="active" href="/filterPrice?sort=featured">Featured</a></li>
-                                            <li><a href="/filterPrice?sort=lowToHigh">Price: Low to High</a></li>
-                                            <li><a href="/filterPrice?sort=highToLow">Price: High to Low</a></li>
-                                            <li><a href="/filterPrice?sort=aA-zZ">Alphabetical: aA-zZ</a></li>
-                                            <li><a href="/filterPrice?sort=zZ-aA">Alphabetical: zZ-aA</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row product-grid-4">
-
-                            <div class="row">
-                                <% for (let i = 0; i < products.length; i++) { %>
-                                    <div class="col-lg-4 col-md-4 col-12 col-sm-6">
-                                        <div class="product-cart-wrap mb-30">
-                                            <!-- Product Image -->
-                                            <div class="product-img-action-wrap">
-                                                <div class="product-img product-img-zoom">
-                                                    <a href="/productDetails?id=<%= products[i]._id %>">
-                                                        <img class="default-img"
-                                                            src="/assets/login/<%= products[i].productImages && products[i].productImages[0] %>"
-                                                            alt="<%= products[i].productName || 'Product Image' %>">
-                                                    </a>
-                                                </div>
-                                                <!-- Quick View & Wishlist -->
-                                                <div class="product-action-1">
-                                                    <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal"
-                                                        data-bs-target="#quickViewModal" onclick="openQuickView('<%= products[i]._id %>')">
-                                                        <i class="fi-rs-search"></i>
-                                                    </a>
-                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up wishlist-btn"
-                                                        data-product-id="<%= products[i]._id %>">
-                                                        <i class="fi-rs-heart"></i>
-                                                    </a>
-                                                </div>
-                                                <div class="product-badges product-badges-position product-badges-mrg">
-                                                    <span class="hot">Hot</span>
-                                                </div>
-                                            </div>
-                                    
-                                            <!-- Product Details -->
-                                            <div class="product-content-wrap">
-                                                <!-- Category -->
-                                                <div class="product-category">
-                                                    <% if (products[i].category) { %>
-                                                    <a href="/shop?category=<%= products[i].category._id %>">
-                                                        <%= products[i].category.name %>
-                                                    </a>
-                                                    <% } else { %>
-                                                    <span>Uncategorized</span>
-                                                    <% } %>
-                                                </div>
-                                    
-                                                <!-- Product Name -->
-                                                <h2>
-                                                    <a href="/productDetails?id=<%= products[i]._id %>">
-                                                        <%= products[i].productName || 'Product Name' %>
-                                                    </a>
-                                                </h2>
-                                    
-                                                <!-- Offer Logic -->
-                                                <div class="rating-result">
-                                                    <% 
-                                                    let lowestSalePrice = null; 
-                                                    let highestRegularPrice = 0;
-                                                    let higherOffer = 0;
-                                    
-                                                    if (products[i].variants && products[i].variants.length > 0) {
-                                                        for (let j = 0; j < products[i].variants.length; j++) {
-                                                            const variant = products[i].variants[j];
-                                                            const salePrice = variant.salePrice || 0;
-                                                            const regularPrice = variant.regularPrice || 0;
-                                    
-                                                            // Determine the lowest sale price and highest regular price
-                                                            if (lowestSalePrice === null || salePrice < lowestSalePrice) {
-                                                                lowestSalePrice = salePrice;
-                                                            }
-                                                            if (regularPrice > highestRegularPrice) {
-                                                                highestRegularPrice = regularPrice;
-                                                            }
-                                                        }
-                                                    }
-                                    
-                                                    // Calculate the higher offer
-                                                    higherOffer = Math.max(products[i].offer || 0, products[i].category?.categoryOffer || 0);
-                                    
-                                                    // Adjust sale price based on higher offer
-                                                    if (higherOffer > 0 && highestRegularPrice > 0) {
-                                                        lowestSalePrice = Math.round(highestRegularPrice - (highestRegularPrice * higherOffer / 100));
-                                                    }
-                                                    %>
-                                    
-                                                    <% if (higherOffer > 0) { %>
-                                                    <span class="save-price font-md color3 ml-15">
-                                                        <%= higherOffer %>% Off
-                                                    </span>
-                                                    <% } %>
-                                                </div>
-                                    
-                                                <!-- Product Price -->
-                                                <div class="product-price">
-                                                    <% if (lowestSalePrice !== null) { %>
-                                                    <span>₹<%= lowestSalePrice %></span>
-                                                    <% } else { %>
-                                                    <span>Price Unavailable</span>
-                                                    <% } %>
-                                                    <% if (highestRegularPrice > 0) { %>
-                                                    <span class="old-price">₹<%= highestRegularPrice %></span>
-                                                    <% } %>
-                                                </div>
-                                    
-                                                <!-- Add to Cart -->
-                                                <div class="product-action-1 show">
-                                                    <a aria-label="Add To Cart" class="action-btn hover-up" href="#">
-                                                        <i class="fi-rs-shopping-bag-add" onclick="addToCart('<%= products[i]._id %>')"></i>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <% } %>
-                                    
-                            </div>
-                            
-                        </div>
+    </section>
+</main>
+<%- include("../../views/partials/user/footer") %>
 
 
-                        <!--pagination----------->
-                        <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination justify-content-start">
-                                    <%for(let i=0;i<=totalPages;i++){%>
-                                        <li class="page-item active ?page=<%= currentPage - 1 %>">
-                                            <a class="page-link" href="?page=<%= i %>">
-                                                <%= i%>
-                                            </a>
-                                        </li>
-                                        <%}%>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                    <!-- filter by category ------------->
-                    <div class="col-lg-3 primary-sidebar sticky-sidebar">
-                        <!-- Category Filter -->
-                        <div class="widget-category mb-30">
-                            <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
-                            <ul class="categories">
-                                <% for (let i=0; i < categories.length; i++) { %>
-                                    <li>
-                                        <a href="/filter?category=<%= categories[i]._id %>">
-                                            <%= categories[i].name %>
-                                        </a>
-                                    </li>
-                                    <% } %>
-                            </ul>
-                        </div>
-
-
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <%- include("../../views/partials/user/footer") %>
-        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-        <script>
-
-
-            function updatePrice(productId) {
-                const variantDropdown = document.getElementById(`variant_${productId}`);
-                const selectedPrice = variantDropdown.value;
-                const priceElement = document.getElementById(`price_${productId}`);
-                priceElement.textContent = `₹${selectedPrice}`;
+<script>
+    // Function to remove an item from the cart
+    function removeFromCart(productId, variantId) {
+        swal({
+            title: "Are you sure?",
+            text: "Do you want to remove this item from the cart?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                fetch('/cart/remove-item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ productId, variantId }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            swal("Success", data.message || "Item removed from cart successfully.", "success").then(() => {
+                                location.reload(); 
+                            });
+                        } else {
+                            swal("Error", data.message || "Failed to remove item from cart.", "error");
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error removing item from cart:", error);
+                        swal("Error", "An error occurred. Please try again.", "error");
+                    });
             }
+        });
+    }
 
-            function addToWishlist(productId){
+    // Function to update the quantity of an item
+    function updateQuantity(productId, variantId, change) {
+        fetch('/update-quantity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId, variantId, change }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    // Update quantity and subtotal on the frontend
+                    const qtySpan = document.querySelector(`#qty-${productId}-${variantId}`);
+                    const subtotalSpan = document.querySelector(`#subtotal-${productId}-${variantId}`);
+                    const checkoutButton = document.querySelector(".cart-action button");
 
-                $.ajax({
-               url:'/addToWishlist',
-               method:'POST',
-               data:{productId:productId},
-               success:(response)=>{
-             if(response.status){
-                swal.fire({
-                    title:'Added to wishlist',
-                    text:response.message,
-                    icon:'success',
-                    timer:2000
-                })
-             }else{
-                swal.fire({
-                    title:'already in wishlist',
-                    text:response.message,
-                    icon:'info',
-                    timer:2000
-                })
-             }
-               },
-               error:(error)=>{
-                swal.fire({
-                title:'Error',
-                text:'Error adding product to your wishlist',
-                icon:'error',
-                timer:2000
-                })
-                
+                    if (qtySpan) qtySpan.textContent = data.updatedItem.quantity;
+                    if (subtotalSpan) {
+                        const subtotal = Math.round(data.updatedItem.quantity * data.updatedItem.variantPrice);
+                        subtotalSpan.textContent = `₹${subtotal}`;
+                    }
+                    calculateCartTotal()
+                    // Show a warning if stock is adjusted
+                    if (data.stockAdjusted) {
+                        swal("Stock Update", `Only ${data.updatedItem.availableStock} items are available for "${data.updatedItem.name}".`, "info");
+                    }
 
-               }
-               
-                })
-            }
+                    // Disable checkout button if any item is out of stock
+                    if (data.cartHasOutOfStock) {
+                        checkoutButton.classList.add("disabled");
+                        checkoutButton.setAttribute("disabled", true);
+                    } else {
+                        checkoutButton.classList.remove("disabled");
+                        checkoutButton.removeAttribute("disabled");
+                    }
+                } else {
+                    // Show an error message
+                    swal("Error", data.message || "Failed to update quantity.", "error").then(()=>{
+                        location.reload();
+                    })
+                    
+                }
+            })
+            .catch((error) => {
+                console.error("Error updating quantity:", error);
+                swal("Error", "An error occurred. Please try again.", "error");
+            });
+    }
 
 
-        </script>
+    function calculateCartTotal() {
+    let total = 0;
+
+    // Select all subtotal elements
+    const subtotalElements = document.querySelectorAll('[id^="subtotal-"]');
+
+    subtotalElements.forEach((element) => {
+        let amountText = element.textContent.replace(/[^0-9.]/g, ''); // Remove ₹ symbol & extra characters
+        let amount = parseFloat(amountText);
+
+        if (!isNaN(amount)) {
+            total += amount;
+        }
+    });
+
+    // Update the cart total in the DOM
+    const cartTotalElement = document.querySelector("#cartTotal span");
+    cartTotalElement.textContent = `₹ ${total.toFixed(2)}`; // Format with 2 decimal places
+}
+
+
+
+    function proceedToCheckout() {
+    const hasOutOfStock = Array.from(document.querySelectorAll('.cart-item'))
+        .some((item) => item.dataset.outOfStock === "true");
+
+    if (hasOutOfStock) {
+        swal("Error", "Your cart contains out-of-stock items. Please remove them to proceed.", "error");
+        return;
+    }
+
+    // Redirect to the checkout page
+    window.location.href = "/checkout";
+}
+
+</script>

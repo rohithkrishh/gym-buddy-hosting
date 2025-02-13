@@ -57,19 +57,22 @@ const LoadWishlist = async (req, res) => {
 };
 
 const addToWishlist = async (req, res) => {
+
     try {
-        const productId = req.body.productId; // Correct variable name
-        const userId = req.session.user; // Assumes userId is stored in session
 
-        console.log("userId", userId);
-        console.log("productId", productId);
+        const productId = req.body.productId; 
+        const userId = req.session.user; 
+      
+        if (!userId) {
+            
+            return res.status(401).json({ status: false, message: "You need to log in first" });
 
+        }
         // Find the wishlist by userId
         let wishlist = await Wishlist.findOne({ userId });
-        console.log("duhduhufh",wishlist);
 
         const product = {
-            productId: productId, // Corrected key name
+            productId: productId, 
             addedAt: Date.now(),
         };
 
@@ -94,6 +97,7 @@ const addToWishlist = async (req, res) => {
         await wishlist.save();
 
        return res.status(200).json({status:true ,message: "Product added to wishlist successfully" });
+
     } catch (error) {
         console.error("Error adding to wishlist:", error);
         res.status(500).json({ error: "An error occurred while adding to wishlist" });

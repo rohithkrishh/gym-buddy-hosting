@@ -268,8 +268,8 @@ const emailSent = await sendVerificationEmail(email,otp);
 
 if(emailSent){
     console.log("Resend OTP:",otp);
-    //res.status(200).json({success:true,message:"OTP Resend Successfully"})
-    res.redirect("/login")
+    res.status(200).json({success:true,message:"OTP Resend Successfully"})
+  
 }else{
     res.status(500).json({success:false,message:"Failed to resend OTP. Please try again"})
 }
