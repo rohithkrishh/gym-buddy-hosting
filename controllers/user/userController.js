@@ -122,9 +122,9 @@ const signup = async (req, res) => {
             console.log("refff", existReferral)
             if (!existReferral) {
                 return res.render("signup", { message: "Invalid Referral code...!" })
+               
             }
-            req.session.userData = referalCode ? referalCode : null
-
+            req.session.userData = referalCode 
         }
 
         const emailSent = await sendVerificationEmail(email, otp);
@@ -203,8 +203,7 @@ const verifyOtp = async (req, res) => {
                 email: user.email,
                 phone: user.phone,
                 password: passwordHash,
-                referalCode: null,
-                redeemed: false // Initially not redeemed
+                redeemed: false 
             });
 
             await newUser.save(); // Save first to generate _id
@@ -217,17 +216,23 @@ const verifyOtp = async (req, res) => {
                     referrer.redeemedUsers.push(newUser._id);
 
                     // Reward the referrer (e.g., add balance to wallet)
-                    referrer.wallet.balance += 50;
+                    referrer.wallet.balance += 500;
                     referrer.wallet.transactions.push({
                         type: "credit",
-                        amount: 50,
+                        amount: 500,
                         description: "Referral reward",
                         date: new Date()
                     });
 
                     await referrer.save();
 
-                    // Mark the new user as redeemed
+                    newUser.wallet.balance += 50;
+                    newUser.wallet.transactions.push({
+                        type: "credit",
+                        amount: 50,
+                        description: "Welcome bonus for signing up with a referral code",
+                        date: new Date()
+                    });
                     newUser.redeemed = true;
                     await newUser.save();
                 }
