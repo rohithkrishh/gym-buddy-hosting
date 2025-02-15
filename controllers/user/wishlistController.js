@@ -19,11 +19,8 @@ const LoadWishlist = async (req, res) => {
         // }
 
         // Query Wishlist by userId
-        let wishlist = await Wishlist.findOne({ userId: user })
-        .populate({
-            path: "products.productId",
-            match: { isblocked: false },
-        });        
+        let wishlist = await Wishlist.findOne({ userId: user }).populate("products.productId");
+        
 
         if (!wishlist) {
             wishlist = {
