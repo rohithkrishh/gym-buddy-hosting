@@ -127,7 +127,7 @@
                                                                             <%= order.paymentStatus %>
                                                                         </td>
                                                                         <td>
-                                                                            <%= order.totalPrice %>
+                                                                            <%= Math.floor(order.finalPrice) %>
                                                                         </td>
 
                                                                         <td><a href="/orderDetails/<%= order._id %>"

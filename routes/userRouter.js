@@ -110,6 +110,7 @@ router.post("/walletPlaceOrder",userAuth,walletController.walletPlaceOrder);
 //Whishlist Management
 router.get("/whishlist",userAuth,WishlistController.LoadWishlist);
 router.post("/addToWishlist",userAuth,WishlistController.addToWishlist);
+router.post("/wishlist/remove-item",userAuth,WishlistController.removeFromWishlist);
 
 //Coupon Management
 router.post("/apply-coupon",userAuth,orderController.verifyCoupon);

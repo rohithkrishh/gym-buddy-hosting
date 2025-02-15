@@ -129,15 +129,16 @@
                                                         </h5>
                                                         <span class="product-qty">x <%= item.quantity %></span>
                                                     </td>
-                                                    <td>₹<%= item.variant.salePrice * item.quantity %>
+                                                    <td>₹<%= Math.floor (item.variant.salePrice * item.quantity) %>
                                                     </td>
                                                     <% subtotal +=item.variant.salePrice * item.quantity; %>
+                                                
                                                 </tr>
                                                 <% }); %>
                                                     <tr>
                                                         <th>SubTotal</th>
                                                         <td colspan="2" class="product-subtotal">₹<span id="subtotal">
-                                                                <%= subtotal %>
+                                                            <%= subtotal = Math.floor(subtotal); %>
                                                             </span></td>
                                                     </tr>
                                                     <tr>
@@ -284,9 +285,9 @@
                 title: 'Coupon Applied!',
                 text: `You saved ₹${result.discount}.`,
             });
-            document.getElementById('couponDiscount').innerText=result.discount.toFixed(2);
+            document.getElementById('couponDiscount').innerText=result.discount.toFixed();
             const finalAmount = subtotal-result.discount.toFixed()
-            document.getElementById('total').innerText=finalAmount.toFixed(2)
+            document.getElementById('total').innerText=finalAmount.toFixed()
             // Update button visibility
             document.getElementById('couponButton').style.display = 'none';
             document.getElementById('RemoveCoupon').style.display = 'inline-block';
@@ -313,7 +314,7 @@ document.getElementById('RemoveCoupon').addEventListener('click', (e) => {
 
     const subtotal = parseFloat(document.getElementById("subtotal").innerText);
     document.getElementById("couponDiscount").innerText = "₹0.00"
-    document.getElementById('total').innerText = subtotal.toFixed(2)
+    document.getElementById('total').innerText = subtotal.toFixed()
 
     // Reset the coupon input and buttons
     document.getElementById('couponCode').value = '';
@@ -385,7 +386,7 @@ async function handleCOD() {
 async function walletPayment() {
 
  const addressId = document.querySelector('input[name="address_selection"]:checked').value;
- const couponCode = document.getElementById("couponInput")?.value.trim() || null; // Assuming a coupon input field exists
+ const couponCode = document.getElementById("couponInput")?.value.trim() || null; 
 
 try {
 

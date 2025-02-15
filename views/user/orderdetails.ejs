@@ -215,7 +215,11 @@
 </style>
 
 <body>
+
+
     <div class="container">
+        <a href="javascript:history.back()" style="display: inline-block; padding: 8px 16px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">← Back</a>
+
         <h1>Order Details</h1>
         <div class="order-info">
             <p><strong>Order ID:</strong> <%= order.transactionId %></p>
@@ -297,7 +301,7 @@
             <strong>Phone:</strong> <%= order.shippingAddress.phone %>
         </p>
 
-        <% if (order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Delivered' && order.orderStatus !== 'Returned') { %>
+        <% if ( order.paymentMethod == 'online' && order.paymentStatus !== 'Pending'  || order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Delivered' && order.orderStatus !== 'Returned') { %>
             <button class="btn cancel-btn" data-order-id="<%= order.id %>">Cancel Order</button>
         <% } %>
 

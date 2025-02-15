@@ -99,10 +99,10 @@ const getCartPage = async (req, res) => {
         };
 
     let total = cart.totalPrice
-   
+    
 
         // Render the cart page with prepared data
-        res.render("shop-cart", { cart: preparedCart,cartTotal:total  });
+        res.render("shop-cart", { cart: preparedCart,cartTotal:Math.floor(total)  });
     } catch (error) {
         console.error("Error fetching cart page:", error);
         res.status(500).render("error-page", {

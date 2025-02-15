@@ -325,9 +325,9 @@ const verifyPayment = async (req, res) => {
             shippingAddress: address,
             transactionId:orderId,
             paymentMethod,
-            totalPrice: calculatedSubTotal,
+            totalPrice:Math.floor(calculatedSubTotal) ,
             discount,
-            finalPrice: calculatedTotal,
+            finalPrice: Math.floor(calculatedTotal),
             paymentStatus
         });
 

@@ -1,5 +1,9 @@
 <%- include("../../views/partials/user/header") %>
 
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
 <main class="main">
     <div class="page-header breadcrumb-wrap">
         <div class="container">
@@ -41,7 +45,12 @@
                                     <td class="text-right" data-title="Cart">
                                         <button class="btn btn-sm"><a href="/productDetails?id=<%=product.productId._id%>"><i class="fi-rs-shopping-bag mr-5" ></i></a>Go to Details</button>
                                     </td>
-                                    <td class="action" data-title="Remove"><a href="#"><i class="fi-rs-trash"></i></a></td>
+                                    <td class="action" data-title="Remove">
+                                        <a href="#" class="text-muted" onclick="removeFromWishlist('<%= product.productId._id %>')">
+                                            <i class="fi-rs-trash"></i>
+                                        </a>
+                                    </td>
+                                    
                                 </tr>
                               
                                 <%})%>
@@ -63,3 +72,48 @@
     </section>
 </main>
 <%- include("../../views/partials/user/footer") %>
+
+
+
+<script>
+
+function removeFromWishlist(productId) {
+    console.log("ddddddd");
+    Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to remove this item from your wishlist?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, remove it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('/wishlist/remove-item', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    Swal.fire("Deleted!", "Item removed from wishlist.", "success").then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire("Error", data.message || "Failed to remove item.", "error");
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                Swal.fire("Error", "Something went wrong. Try again later.", "error");
+            });
+        }
+    });
+}
+
+
+
+</script>

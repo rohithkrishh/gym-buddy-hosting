@@ -242,7 +242,7 @@
     const subtotalElements = document.querySelectorAll('[id^="subtotal-"]');
 
     subtotalElements.forEach((element) => {
-        let amountText = element.textContent.replace(/[^0-9.]/g, ''); // Remove ₹ symbol & extra characters
+        let amountText = element.textContent.replace(/[^0-9.]/g, ''); 
         let amount = parseFloat(amountText);
 
         if (!isNaN(amount)) {
@@ -252,7 +252,7 @@
 
     // Update the cart total in the DOM
     const cartTotalElement = document.querySelector("#cartTotal span");
-    cartTotalElement.textContent = `₹ ${total.toFixed(2)}`; // Format with 2 decimal places
+    cartTotalElement.textContent = `₹ ${total.toFixed()}`; 
 }
 
 
