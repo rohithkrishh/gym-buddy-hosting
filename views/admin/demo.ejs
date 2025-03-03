@@ -1,0 +1,477 @@
+
+//this is add product with alert validation message
+
+<%- include("../../views/partials/admin/header") %>
+
+    <head>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+
+    </head>
+    <style>
+        .error-message {
+            color: red;
+        }
+
+
+        .thumbnails-container {
+            display: flex;
+            overflow-x: auto;
+        }
+
+
+        .thumbnail {
+            margin-right: 10px;
+
+
+        }
+    </style>
+
+    <section class="content-main">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Add New Product</h2>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="post" action="/admin/addProducts" enctype="multipart/form-data"
+                            onsubmit="return validateForm()">
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Product Name</label>
+                                <input type="text" placeholder="Type here" name="productName"
+                                    class="form-control border" id="product_name">
+                                <div id="productName-error" class="error-message"></div>
+                            </div>
+
+                            <div class="col-lg-4 mb-4">
+                                <label class="form-label">Brand</label>
+                                <select class="form-select border" name="brand">
+                                    <% for (let i=0; i < brand.length; i++) { %>
+                                        <option value="<%= brand[i].brandName %>">
+                                            <%= brand[i].brandName %>
+                                        </option>
+                                        <% } %>
+                                </select>
+                                <div id="brand-error" class="error-message"></div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Full Description</label>
+                                <textarea placeholder="Type here" id="descriptionid" name="description"
+                                    class="form-control border" rows="4"></textarea>
+                                <div id="description-error" class="error-message"></div>
+                            </div>
+
+
+                            <div class="mb-4">
+                                <label class="form-label">Category</label>
+
+
+                                <select class="form-select border" name="category" id="categorySelect"
+                                    onchange="updateVariantFields()">
+                                    <option value="" disabled selected>Select Category</option>
+                                    <% for (let i=0; i < cat.length; i++) { %>
+                                        <option value="<%= cat[i]._id %>|<%= cat[i].type %>">
+                                            <%= cat[i].name %>
+                                        </option>
+                                        <% } %>
+                                </select>
+
+
+                                <div id="category-error" class="error-message"></div>
+                            </div>
+                            <div id="variantFields" class="mb-4">
+
+                                <!-- Dynamic variant fields will be added here ------>
+                            </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-header">
+                    <h4>Choose Images</h4>
+                </div>
+                <div class="row">
+                    <% for (let i=1; i <=4; i++) { %>
+                        <div class="card-body align-items-center" style="margin-bottom: 20px;">
+                            <label class="form-label">Image <%= i %></label>
+                            <input class="form-control" type="file" name="images" id="input<%= i %>"
+                                accept="image/png, image/jpeg, image/jpg, image/webp"
+                                onchange="viewImage(event, <%= i %>)">
+                            <div class="image-cropper d-flex align-items-center mt-3" style="display: none;"
+                                id="cropper<%= i %>">
+                                <img src="" id="croppedImg<%= i %>" alt="" class="me-3" style="max-width: 150px;">
+                                <button type="button" class="btn btn-sm btn-primary"
+                                    onclick="saveImage(<%= i %>)">Save</button>
+                            </div>
+                        </div>
+                        <% } %>
+                </div>
+            </div>
+
+            <div>
+                <button class="btn btn-md rounded font-sm hover-up" type="submit">Publish</button>
+            </div>
+            </form>
+        </div>
+        </div>
+        </div>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script>
+
+        function updateVariantFields() {
+            // const categoryType = document.getElementById("categorySelect").value;
+            const variantFieldsContainer = document.getElementById("variantFields");
+
+            const categoryValue = document.getElementById("categorySelect").value;
+            const [categoryId, categoryType] = categoryValue.split('|');
+
+            console.log("Selected Category ID:", categoryId);
+            console.log("Selected Category Type:", categoryType);
+
+            // Clear previous fields
+            variantFieldsContainer.innerHTML = "";
+
+            if (!categoryType) {
+                return; // Exit if no category is selected
+            }
+
+            addVariantFields(categoryType);
+
+            // Add a button to allow adding more variants
+            const addVariantButton = document.createElement("button");
+            addVariantButton.type = "button";
+            addVariantButton.className = "btn btn-secondary mt-3";
+            addVariantButton.innerText = "Add Another Variant";
+            addVariantButton.onclick = () => addVariantFields(categoryType);
+            variantFieldsContainer.appendChild(addVariantButton);
+
+
+
+        }
+
+
+        let variantIndex = 0; // To keep track of the variant index
+
+        function addVariantFields(categoryType) {
+            const variantFieldsContainer = document.getElementById("variantFields");
+
+            // Create a container for this variant
+            const variantContainer = document.createElement("div");
+            variantContainer.className = "variant-container border p-3 mb-3";
+            variantContainer.style.borderRadius = "8px";
+            variantContainer.setAttribute("data-index", variantIndex);
+
+            // Add category-specific fields
+            if (categoryType === "strength") {
+                const weightField = document.createElement("div");
+                weightField.className = "mb-4";
+                weightField.innerHTML = `
+            <label class="form-label">Weight (kg)</label>
+            <input type="number" name="variants[${variantIndex}][weight]" class="form-control border" min="0" >`;
+
+
+                variantContainer.appendChild(weightField);
+            } else if (categoryType === "cardio") {
+                const typeField = document.createElement("div");
+                typeField.className = "mb-4";
+                typeField.innerHTML = `
+            <label class="form-label">Type</label>
+            <select name="variants[${variantIndex}][type]" class="form-select border" >
+                <option value="" disabled selected>Select Type</option>
+                <option value="automated">Automated</option>
+                <option value="semi-automated">Semi-Automated</option>
+                <option value="manual">Manual</option>
+            </select>`;
+                variantContainer.appendChild(typeField);
+            }
+
+            // Add common fields for all variants
+            const commonFields = `
+        <div class="mb-4">
+            <label class="form-label">Regular Price</label>
+            <input type="number" name="variants[${variantIndex}][regularPrice]" class="form-control border" min="0" >
+        </div>
+        <div class="mb-4">
+            <label class="form-label">Sale Price</label>
+            <input type="number" name="variants[${variantIndex}][salePrice]" class="form-control border" min="0" >
+        </div>
+        <div class="mb-4">
+            <label class="form-label">Stock</label>
+            <input type="number" name="variants[${variantIndex}][stock]" class="form-control border" min="0" >
+        </div>
+        <div class="mb-4">
+            <label class="form-label">SKU</label>
+            <input type="text" name="variants[${variantIndex}][sku]" class="form-control border" >
+        </div>
+        <button type="button" class="btn btn-danger btn-sm" onclick="removeVariant(this)">Remove Variant</button>`;
+            variantContainer.innerHTML += commonFields;
+
+            // Append the variant container to the main container
+            variantFieldsContainer.appendChild(variantContainer);
+
+            // Increment the variant index
+            variantIndex++;
+        }
+
+        function removeVariant(button) {
+            // Remove the parent variant container
+            const variantContainer = button.closest(".variant-container");
+            if (variantContainer) {
+                variantContainer.remove();
+            }
+        }
+
+
+        function removeVariant(button) {
+            const variantContainer = button.parentElement;
+            variantContainer.remove();
+        }
+
+
+        function validateForm() {
+            let isValid = true;
+
+            // Clear previous error messages
+            document.querySelectorAll(".error-message").forEach((el) => (el.innerText = ""));
+
+            // Validate Product Name
+            const productName = document.getElementById("product_name").value.trim();
+            if (productName === "") {
+                document.getElementById("productName-error").innerText = "Product Name is required.";
+                isValid = false;
+            }
+
+            // Validate Brand
+            const brand = document.querySelector("select[name='brand']").value;
+            if (brand === "") {
+                document.getElementById("brand-error").innerText = "Please select a brand.";
+                isValid = false;
+            }
+
+            // Validate Description
+            const description = document.getElementById("descriptionid").value.trim();
+            if (description === "" || description.length < 10) {
+                document.getElementById("description-error").innerText =
+                    "Description is required and must be at least 10 characters.";
+                isValid = false;
+            }
+
+            // Validate Category
+            const categorySelect = document.getElementById("categorySelect").value;
+            if (!categorySelect) {
+                document.getElementById("category-error").innerText = "Please select a category.";
+                isValid = false;
+            }
+
+            // Validate Variants
+            const variantFields = document.querySelectorAll(".variant-container");
+            if (variantFields.length === 0) {
+                document.getElementById("variantFields").innerHTML =
+                    '<div class="error-message">At least one variant is required.</div>';
+                isValid = false;
+            }
+
+            variantFields.forEach((variantField) => {
+                const weightInput = variantField.querySelector("input[name*='[weight]']");
+                const typeInput = variantField.querySelector("select[name*='[type]']");
+                const regularPriceInput = variantField.querySelector("input[name*='[regularPrice]']");
+                const salePriceInput = variantField.querySelector("input[name*='[salePrice]']");
+                const stockInput = variantField.querySelector("input[name*='[stock]']");
+                const skuInput = variantField.querySelector("input[name*='[sku]']");
+
+                // Validate Weight or Type (depending on category)
+                if (weightInput && weightInput.value === "") {
+                    alert("Weight is required for strength category.");
+                    isValid = false;
+                }
+                if (typeInput && typeInput.value === "") {
+                    alert("Type is required for cardio category.");
+                    isValid = false;
+                }
+
+                // Validate Regular Price
+                if (regularPriceInput.value <= 0) {
+                    alert("Regular Price must be greater than 0.");
+                    isValid = false;
+                }
+
+                // Validate Sale Price
+                if (salePriceInput.value <= 0 || +salePriceInput.value >= +regularPriceInput.value) {
+                    alert("Sale Price must be less than Regular Price and greater than 0.");
+                    isValid = false;
+                }
+
+                // Validate Stock
+                if (stockInput.value <= 0) {
+                    alert("Stock must be greater than 0.");
+                    isValid = false;
+                }
+
+                // Validate SKU
+                if (skuInput.value.trim() === "") {
+                    alert("SKU is required.");
+                    isValid = false;
+                }
+            });
+
+            // Validate Images (at least 1 image required)
+            const allowedExtensions = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+            const minImagesRequired = 2;
+
+            // Select all input fields with type="file"
+            const imageInputs = document.querySelectorAll("input[name='images']");
+            const selectedFiles = [];
+
+            imageInputs.forEach(input => {
+                if (input.files.length > 0) {
+                    selectedFiles.push(...input.files);
+                }
+            });
+
+            console.log("Selected files:", selectedFiles); // Debugging
+
+            // Check if minimum images are uploaded
+            if (selectedFiles.length < minImagesRequired) {
+                alert(`Please upload at least ${minImagesRequired} images.`);
+                isValid = false;
+            } else {
+                // Check for valid file types
+                const invalidFiles = selectedFiles.filter(file => !allowedExtensions.includes(file.type));
+                if (invalidFiles.length > 0) {
+                    alert("Invalid file type detected. Please upload only PNG, JPG, JPEG, or WEBP images.");
+                    isValid = false;
+                }
+            }
+
+            return isValid; // Prevent form submission if validation fails
+        }
+
+        function viewImage1(event) {
+            document.getElementById("imgView1").src = URL.createObjectURL(event.target.files[0])
+        }
+
+        function viewImage2(event) {
+            document.getElementById("imgView2").src = URL.createObjectURL(event.target.files[0])
+        }
+
+        function viewImage3(event) {
+            document.getElementById("imgView3").src = URL.createObjectURL(event.target.files[0])
+        }
+
+        function viewImage4(event) {
+            document.getElementById("imgView4").src = URL.createObjectURL(event.target.files[0])
+        }
+
+
+        let croppers = {};
+
+        function viewImage(event, index) {
+            const input = event.target;
+            const file = input.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const cropperContainer = document.getElementById(`cropper${index}`);
+                    const img = document.getElementById(`croppedImg${index}`);
+
+                    // Reset Cropper if it already exists
+                    if (croppers[index]) {
+                        croppers[index].destroy();
+                    }
+
+                    cropperContainer.style.display = 'flex';
+                    img.src = e.target.result;
+
+                    // Initialize Cropper.js
+                    croppers[index] = new Cropper(img, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        guides: true,
+                        background: false,
+                        autoCropArea: 1,
+                        zoomable: true,
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveImage(index) {
+            if (croppers[index]) {
+                const cropper = croppers[index];
+                const croppedCanvas = cropper.getCroppedCanvas();
+                const img = document.getElementById(`croppedImg${index}`);
+
+                croppedCanvas.toBlob((blob) => {
+                    const fileName = `cropped-img-${Date.now()}-${index}.png`;
+
+                    // Simulate file upload to input
+                    const input = document.getElementById(`input${index}`);
+                    const newFile = new File([blob], fileName, { type: blob.type });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(newFile);
+                    input.files = dataTransfer.files;
+
+                    img.src = croppedCanvas.toDataURL('image/png');
+                    alert(`Image ${index} cropped and saved.`);
+                });
+
+                // Cleanup Cropper
+                cropper.destroy();
+                croppers[index] = null;
+
+                const cropperContainer = document.getElementById(`cropper${index}`);
+                cropperContainer.style.display = 'none';
+            }
+        }
+
+
+        const selectedImages = [];
+        document.getElementById("input1").addEventListener("change", handleFileSelect);
+
+        function handleFileSelect(event) {
+
+            const addedImagesContainer = document.getElementById("addedImagesContainer");
+            addedImagesContainer.innerHTML = " ";
+            const files = event.target.files;
+            for (let i = 0; i < files.length; i++) {
+
+                const file = files[i];
+                selectedImages.push(file);
+                const thumbnail = document.createElement("div");
+                thumbnail.classList.add("thumbnail");
+                const img = document.createElement("img");
+                img.src = URL.createObjectURL(file);
+                img.alt = "thumbnail";
+                img.style.width = "50px";
+                img.style.height = "auto";
+                const removeIcon = document.createElement("span");
+                removeIcon.classList.add("remove-icon");
+                removeIcon.innerHTML = "&times";
+                removeIcon.addEventListener("click", function () {
+                    const index = selectedImages.indexOf(file);
+                    if (index !== 1) {
+                        selectedImages.splice(index, 1);
+                    }
+                    thumbnail.remove();
+                });
+
+                thumbnail.appendChild(img);
+                thumbnail.appendChild(removeIcon);
+                addedImagesContainer.appendChild(thumbnail);
+            }
+
+
+        }
+
+
+    </script>

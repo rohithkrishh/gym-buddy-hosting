@@ -6,7 +6,7 @@
     <meta name="keywords" content="Male_Fashion, unica, creative, html" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Male-Fashion</title>
+    <title>Gym-Buddy</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
@@ -25,7 +25,7 @@
             margin: 0;
             font-family: "Nunito Sans", sans-serif;
             overflow: hidden;
-            background-color: #f8f9fa;
+            background-color: #000306;
         }
 
         .container {
@@ -246,41 +246,46 @@ document.getElementById("resendOtpBtn").disabled = true;
     }
     startTimer();
 
-    function validateOTPForm(event){
-        event.preventDefault();
-        const otpInput=document.getElementById("otp").value
-        $.ajax({
-            type:"POST",
-            url:"verify-otp",
-            data:{otp:otpInput},
-            success:function(response){
-                if(response.success){
-                    Swal.fire({
-                        icon:"success",
-                        title:"OTP verified successfully",
-                        showConfirmButton:false,
-                        timer:1500,
-                    }).then(()=>{
-                        window.location.href=response.redirectUrl;
-                    })
-                }else{
-                    Swal.fire({
-                        icon:"error",
-                        title:"Error",
-                        text:response.message,
-                    })
-                }
-            },error:function(){
-                Swal.fire({
-                    icon:"error",
-                    title:"Invalid OTP",
-                    text:"Please try again"
-                })
-            }
+    
 
-        })
-        return false;
-    }
+    function validateOTPForm() {
+            const otpInput = document.getElementById("otp").value;
+
+            $.ajax({
+                type: "POST",
+                url: "/verify-otp",
+                data: { otp: otpInput },
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "OTP Verified Successfully",
+                            showConfirmButton: false,
+                            timer: 1000
+                        }).then(() => {
+                            window.location.href = response.redirectUrl;
+                        })
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: response.message,
+                        })
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Invalid OTP",
+                        text: "Please try again.."
+                    });
+                }
+            });
+            return false;
+        }
+    
+
+    
 
 function resendOTP(){
 clearInterval(timerInterval);

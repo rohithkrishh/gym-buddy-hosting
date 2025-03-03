@@ -2,6 +2,9 @@
 <div class="container mt-4">
     <h3 class="mt-3" style="color: #046963; margin-bottom:70px">Create User Address</h3>
     <form id="addressForm" method="POST" action="/addAddress" class="border-0 p-3">
+
+        <input type="hidden" name="fromCheckout" value="<%= fromCheckout ? 'checkout' : '' %>">
+
         <div class="row mb-50">
             <div class="form-group col-md-4">
                 <label for="addressType">Address Type:</label>
@@ -40,7 +43,11 @@
                 <input type="number" class="form-control border-3" id="altPhone" name="altPhone">
             </div>
         </div>
+        
+
         <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
+
+        
     </form>
 </div>
 
@@ -58,6 +65,8 @@
         form.addEventListener('submit', function (event) {
             let isValid = true;
             inputs.forEach(input => {
+
+
                 if (!validateField(input)) {
                     isValid = false;
                 }
@@ -69,10 +78,14 @@
         });
 
         function validateField(input) {
+
+         if (input.type === "hidden") return true;
+
             const value = input.value.trim();
             const errorElementId = input.id + '-error';
             let errorMessage = '';
 
+           
             if (value === '') {
                 errorMessage = 'This field is required.';
             } else {

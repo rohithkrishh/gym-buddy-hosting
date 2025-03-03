@@ -22,28 +22,38 @@ const getBrandPage = async (req,res)=>{
     }
 }
 
-const addBrand = async (req,res)=>{
 
+
+const addBrand = async (req, res) => {
     try {
-        const brand =req.body.name;
-        const findBrand = await Brand.findOne({  brandName:Brand});
-        if(!findBrand){
-            const image = req.file.filename;
-            const newBrand =new Brand({
-                brandName :brand,
-                brandImage:image
-            })
-            await newBrand.save()
-            res.redirect("/admin/brands")
-        }
+      const brand = req.body.name;
+      const findBrand = await Brand.findOne({ 
+        brandName: { $regex: new RegExp(`^${brand}$`, 'i') } }); 
+           
+      console.log("dd", findBrand);
+      
+      if (findBrand) {
+        console.log("1");
+        return res.status(400).json({ success: false, message: "Brand name already exists" });
+      }
+      
+      const image = req.file.filename;
+      const newBrand = new Brand({
+        brandName: brand,
+        brandImage: image
+      });
+      await newBrand.save();
+      
+      // If you want to use JSON responses consistently:
+      return res.status(200).json({ success: true, message: "Brand added successfully" });
+      
     
     } catch (error) {
-       res.redirect("/pageerror") 
+      console.log("Error in addBrand:", error);
+      return res.status(500).json({ success: false, message: "An error occurred" });
+      
     }
-
-
-}
-
+  };
 
 
  

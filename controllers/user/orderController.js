@@ -59,13 +59,14 @@ const loadCheckout = async (req, res) => {
                     path: "variants",
                     select: "type weight salePrice stock ", 
                 },
-                select: "productName productImages variants", 
+                select: "product productName productImages variants isBlocked", 
             });
-   
-        
-        // if (!cart || cart.items.length === 0) {
-        //     return res.render("checkout", { cart: { items: [], total: 0 }, addresses: [] });
-        // }
+
+            
+          cart.items = cart.items.filter((item) => !item.product.isBlocked);
+
+       console.log("dh", JSON.stringify(cart?.toObject() || {}, null, 2));
+               
 
         // Calculate cart total
         const cartTotal = cart.items.reduce((total, item) => {
@@ -129,9 +130,7 @@ const loadCheckout = async (req, res) => {
         res.render("checkout", { cart: preparedCart, addresses: preparedAddresses,coupons:activeCoupon, });
     } catch (error) {
         console.error("Error fetching checkout page:", error);
-        res.status(500).render("error-page", {
-            error: "Something went wrong while loading the checkout page. Please try again later.",
-        });
+        res.redirect("/pageNotFound")
     }
 };
 

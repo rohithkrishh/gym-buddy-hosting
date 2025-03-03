@@ -532,44 +532,56 @@
         }
 
 
+        // function zoomImage(e) {
+        //     const image = e.target;
+        //     const zoomer = e.currentTarget;
+        //     const x = e.offsetX / zoomer.offsetWidth;
+        //     const y = e.offsetY / zoomer.offsetHeight;
+        //     const zoomLevel = 2;
+
+        //     image.style.transformOrigin = `${x * 100}% ${y * 100}%`; // Corrected template literal
+        //     image.style.transform = `scale(${zoomLevel})`; // Corrected template literal
+        // }
+
+
+        // function resetZoom(e) {
+        //     console.log("mouse leaved");
+
+        //     const image = e.target;
+        //     image.style.transformOrigin = 'center center';
+        //     image.style.transform = 'scale(1)';
+        // }
+
+
         function zoomImage(e) {
-            const image = e.target;
-            const zoomer = e.currentTarget;
-            const x = e.offsetX / zoomer.offsetWidth;
-            const y = e.offsetY / zoomer.offsetHeight;
-            const zoomLevel = 2;
+    const zoomer = e.currentTarget; // Parent container
+    const image = zoomer.querySelector("img"); // Find the image inside the container
+    const x = e.offsetX / zoomer.offsetWidth;
+    const y = e.offsetY / zoomer.offsetHeight;
+    const zoomLevel = 2;
 
-            image.style.transformOrigin = `${x * 100}% ${y * 100}%`; // Corrected template literal
-            image.style.transform = `scale(${zoomLevel})`; // Corrected template literal
-        }
+    image.style.transformOrigin = `${x * 100}% ${y * 100}%`;
+    image.style.transform = `scale(${zoomLevel})`;
+}
 
+function resetZoom(e) {
+    console.log("Mouse left zoom container"); // Debugging
 
-        function resetZoom(e) {
-            console.log("mouse leaved");
+    const zoomer = e.currentTarget; // Parent container
+    const image = zoomer.querySelector("img"); // Find the image
 
-            const image = e.target;
-            image.style.transformOrigin = 'center center';
-            image.style.transform = 'scale(1)';
-        }
+    image.style.transformOrigin = "center center";
+    image.style.transform = "scale(1)";
+}
+
+// Attach event listeners to the zoom container, not the image
+document.querySelectorAll(".zoom-container").forEach(container => {
+    container.addEventListener("mousemove", zoomImage);
+    container.addEventListener("mouseleave", resetZoom); // Attach to the container
+});
+
 
   
-//     function updateVariantDetails() {
-//     const selectedVariantIndex = document.getElementById("variant-select").value;
-//     const variants = <%- JSON.stringify(product.variants) %>;
-
-//     const selectedVariant = variants[selectedVariantIndex];
-//     if (selectedVariant) {
-//         document.getElementById("dynamic-price").innerText = `₹${selectedVariant.price}`;
-//         document.getElementById("dynamic-stock").innerText = `${selectedVariant.stock} Items In Stock`;
-//         document.getElementById("dynamic-sku").innerText = selectedVariant.sku;
-
-//         // Update the variantId in the hidden input field
-//         document.getElementById("variantId").value = selectedVariant._id;
-//     }
-// }
-
-
-
 
 function updateVariantDetails() {
     const selectedVariantIndex = document.getElementById("variant-select").value;

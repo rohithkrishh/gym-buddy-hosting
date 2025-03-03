@@ -2,7 +2,8 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6 mt-60">
-            <form method="post" action="/admin/editCategory/<%=category._id%>" onsubmit="return handleFormSubmit(event)">
+            <form method="post" action="" onsubmit="return handleFormSubmit(event)">
+              
                 <div class="d-grid text-end mt-30 col-md-5">
                     <button class="btn btn-primary" type="submit">Update category</button>
                 </div>
@@ -34,6 +35,8 @@
 
 <%- include("../../views/partials/admin/footer") %>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
 
@@ -47,8 +50,9 @@ function handleFormSubmit(event) {
     // Get the values from the form
     const name = document.getElementsByName("categoryName")[0].value.trim();
     const description = document.getElementById("descriptionId").value.trim();
-    const categoryId = "<%=category._id%>";
-    
+
+     const categoryId = "<%=category._id%>";
+     console.log("1",name)
     
     console.log("ddddd",categoryId);
 
@@ -57,10 +61,13 @@ function handleFormSubmit(event) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ categoryName, description, type }) 
+        body: JSON.stringify({ name, description, type }) 
     })
+
     .then(response => {
+        console.log("reddd",response)
         if (!response.ok) {
+            
             return response.json().then(err => {
                 throw new Error(err.error);
             });
@@ -89,9 +96,11 @@ function handleFormSubmit(event) {
 
 
 function validateForm(){
+    console.log("dddd")
     clearErrorMessages();
-    const name = document.getElementsByName("name")[0].value.trim();
-    const description = document.getElementById("descriptionId").value.trim();
+    const name = document.getElementsByName("categoryName")[0].value
+    const description = document.getElementById("descriptionId").value
+    console.log("ff",name,description)
     isValid = true;
 
     if(name===""){

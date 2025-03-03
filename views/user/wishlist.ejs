@@ -43,8 +43,11 @@
                                     </td>
                                    
                                     <td class="text-right" data-title="Cart">
-                                        <button class="btn btn-sm"><a href="/productDetails?id=<%=product.productId._id%>"><i class="fi-rs-shopping-bag mr-5" ></i></a>Go to Details</button>
+                                        <a href="/productDetails?id=<%= product.productId._id %>" class="btn btn-sm btn-primary text-white">
+                                            Go to Details
+                                        </a>
                                     </td>
+                                    
                                     <td class="action" data-title="Remove">
                                         <a href="#" class="text-muted" onclick="removeFromWishlist('<%= product.productId._id %>')">
                                             <i class="fi-rs-trash"></i>

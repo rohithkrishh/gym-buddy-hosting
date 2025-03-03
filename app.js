@@ -52,6 +52,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', userRouter);
 app.use('/admin', adminRouter);
 
+
+app.use('/admin/*', (req, res) => {
+
+    res.status(404).render('admin-error', { message: 'Page not found!' });
+});
+
+
+app.use("/*",(req,res)=>{
+
+    res.status(404).render('page-404',)
+
+})
+
+
 app.listen(process.env.PORT, () => {
     console.log(`Server running at http://localhost:${process.env.PORT}/`);
     console.log(`Admin login: http://localhost:${process.env.PORT}/admin/login`);

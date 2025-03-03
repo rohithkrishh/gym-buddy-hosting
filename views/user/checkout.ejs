@@ -74,21 +74,46 @@
                         <!-- Address Selection -->
                         <div class="form-group">
                             <label for="address-selection"><strong>Select Address:</strong></label>
-                            <% if (addresses && addresses.length > 0) { %>
-                                <% addresses.forEach((address, index) => { %>
-                                    <label for="address<%= index %>" class="radio-label">
-                                        <input
-                                            type="radio"
-                                            id="address<%= index %>"
-                                            name="address_selection"
-                                            value="<%= address._id %>"
-                                            class="radio-input"
-                                            <%= index === 0 ? 'checked' : '' %>>
-                                        <span class="radio-custom"></span>
-                                        <%= address.fullAddress %>
-                                    </label>
-                                <% }); %>
-                            <% } %>
+                            <% if (addresses && addresses.length> 0) { %>
+                                <h5>Select Shipping Address:</h5>
+                                <% addresses.forEach((addr, index)=> { %>
+                                    <div class="address-option">
+                                        <input style="height: 20px;" type="radio" name="address_selection"
+                                            id="address-<%= index %>" value="<%= addr._id %>" <%=index===0 ? 'checked'
+                                            : '' %>>
+                                        <label for="address-<%= index %>">
+                                            <p><strong>Address Type:</strong>
+                                                <%= addr.addressType %>
+                                            </p>
+                                            <p><strong>Name:</strong>
+                                                <%= addr.name %>
+                                            </p>
+                                            <p><strong>City:</strong>
+                                                <%= addr.city %>
+                                            </p>
+                                            <p><strong>Landmark:</strong>
+                                                <%= addr.landMark %>
+                                            </p>
+                                            <p><strong>State:</strong>
+                                                <%= addr.state %>
+                                            </p>
+                                            <p><strong>Postal Code:</strong>
+                                                <%= addr.pincode %>
+                                            </p>
+                                            <p><strong>Phone:</strong>
+                                                <%= addr.phone %>
+                                            </p>
+                                            <p><strong>Alt Phone:</strong>
+                                                <%= addr.altPhone %>
+                                            </p>
+                                        </label>
+                                        <hr>
+                                    </div>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <p>No addresses found. Please update your profile with a shipping address.
+                                            </p>
+                                            <% } %>
                               
                         </div>
 
@@ -156,18 +181,19 @@
                                                         </td>
                                                     </tr>
                                     </tbody>
+                                    <% } %>
                                 </table>
                         
                                 <!-- Coupon Input Section -->
                                 <!-- <div class="coupon-section mt-3">
-                                    <input type="text" id="couponCode" placeholder="Enter Coupon Code" class="form-control d-inline-block"
+                                     <input type="text" id="couponCode" placeholder="Enter Coupon Code" class="form-control d-inline-block"
                                         style="width: 60%;">
                                     <button id="applyCoupon" class="btn btn-primary">Apply Coupon</button>
                                     <button id="removeCoupon" class="btn btn-danger" style="display: none;">Remove Coupon</button>
                                 </div>
-                                <% } else { %>
-                                    <p>Your cart is empty. <a href="/shop">Continue Shopping</a></p>
-                                    <% } %>
+                                
+                                    <p>Your cart is empty. <a href="/shop">Continue Shopping</a></p> -
+                                 
                         </div> -->
                         
 
@@ -248,7 +274,7 @@
 <script>
     // Redirect to Add Address Page
     function redirectToAddressPage() {
-        return window.location.href = "/addAddress";
+        return window.location.href = "/addAddress?from=checkout";
     }
 
     document.getElementById('couponButton').addEventListener('click', async (e) => {
@@ -335,8 +361,19 @@ document.getElementById('RemoveCoupon').addEventListener('click', (e) => {
 document.getElementById("placeOrderButton").addEventListener("click", async (e) => {
     e.preventDefault();
 
- const paymentMethod = document.querySelector('input[name="payment_option"]:checked').id;
+//  const paymentMethod = document.querySelector('input[name="payment_option"]:checked').id;
+const paymentMethodElement = document.querySelector('input[name="payment_option"]:checked');
 
+ if (!paymentMethodElement) {
+        Swal.fire({
+            icon: "warning",
+            title: "Payment Method Required",
+            text: "Please select a payment method before placing the order.",
+        });
+        return; // Stop execution if no payment method is selected
+    }
+    
+const paymentMethod = paymentMethodElement.id;
 const subtotalElement = document.querySelector(".font-xl.text-brand.fw-900");
 
 const subtotalText = subtotalElement.textContent.trim(); 

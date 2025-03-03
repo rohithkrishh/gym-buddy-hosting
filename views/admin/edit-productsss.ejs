@@ -29,7 +29,7 @@
         <div class="row">
             <div class="col-9">
                 <div class="content-header">
-                    <h2 class="content-title">Add New Product</h2>
+                    <h2 class="content-title">Edit Product</h2>
                 </div>
             </div>
             <div class="col-lg-6">
@@ -282,6 +282,104 @@
             // Increment the variant index
             variantIndex++;
         }
+
+        function validateForm() {
+        let isValid = true;
+
+        // Clear previous error messages
+        document.querySelectorAll(".error-message").forEach((el) => (el.innerText = ""));
+
+        // Validate Product Name
+        const productName = document.getElementById("product_name").value.trim();
+        if (productName === "") {
+            document.getElementById("productName-error").innerText = "Product Name is required.";
+            isValid = false;
+        }
+
+        // Validate Brand
+        const brand = document.querySelector("select[name='brand']").value;
+        if (brand === "") {
+            document.getElementById("brand-error").innerText = "Please select a brand.";
+            isValid = false;
+        }
+
+        // Validate Description
+        const description = document.getElementById("descriptionid").value.trim();
+        if (description === "" || description.length < 10) {
+            document.getElementById("description-error").innerText =
+                "Description is required and must be at least 10 characters.";
+            isValid = false;
+        }
+
+        // Validate Category
+        const categorySelect = document.getElementById("categorySelect").value;
+        if (!categorySelect) {
+            document.getElementById("category-error").innerText = "Please select a category.";
+            isValid = false;
+        }
+
+        // Validate Variants
+        const variantFields = document.querySelectorAll(".variant-container");
+        if (variantFields.length === 0) {
+            document.getElementById("variantFields").innerHTML =
+                '<div class="error-message">At least one variant is required.</div>';
+            isValid = false;
+        }
+
+        variantFields.forEach((variantField) => {
+            const weightInput = variantField.querySelector("input[name*='[weight]']");
+            const typeInput = variantField.querySelector("select[name*='[type]']");
+            const regularPriceInput = variantField.querySelector("input[name*='[regularPrice]']");
+            const salePriceInput = variantField.querySelector("input[name*='[salePrice]']");
+            const stockInput = variantField.querySelector("input[name*='[stock]']");
+            const skuInput = variantField.querySelector("input[name*='[sku]']");
+
+            // Validate Weight or Type (depending on category)
+            if (weightInput && weightInput.value === "") {
+                alert("Weight is required for strength category.");
+                isValid = false;
+            }
+            if (typeInput && typeInput.value === "") {
+                alert("Type is required for cardio category.");
+                isValid = false;
+            }
+
+            // Validate Regular Price
+            if (regularPriceInput.value <= 0) {
+                alert("Regular Price must be greater than 0.");
+                isValid = false;
+            }
+
+            // Validate Sale Price
+            if (salePriceInput.value <= 0 || +salePriceInput.value >= +regularPriceInput.value) {
+                alert("Sale Price must be less than Regular Price and greater than 0.");
+                isValid = false;
+            }
+
+            // Validate Stock
+            if (stockInput.value <= 0) {
+                alert("Stock must be greater than 0.");
+                isValid = false;
+            }
+
+            // Validate SKU
+            if (skuInput.value.trim() === "") {
+                alert("SKU is required.");
+                isValid = false;
+            }
+        });
+
+        // Validate Images (at least 1 image required)
+        // const imageInputs = document.querySelectorAll("input[type='file']");
+        // const hasImage = Array.from(imageInputs).some((input) => input.files.length > 0);
+        // if (!hasImage) {
+        //     alert("Please upload at least one image.");
+        //     isValid = false;
+        // }
+
+        return isValid; // Prevent form submission if validation fails
+    }
+
 
         function removeVariant(button) {
             // Remove the parent variant container

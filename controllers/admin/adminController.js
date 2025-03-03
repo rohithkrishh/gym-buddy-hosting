@@ -31,31 +31,25 @@ const login = async (req, res) => {
     if (!admin) {
       
         
-      return res.redirect("/admin/login"); 
+      return res.render("adminlogin",{message:"You are not a authenticted admin"}); 
     }
 
     // Check if the password matches
     const passwordMatch = await bcrypt.compare(password, admin.password);
 
     if (passwordMatch) {
-      // Set admin session
+      
       req.session.admin = true;
-console.log("-------===correctp");
 
-      // Redirect to admin dashboard
-      return res.redirect('/admin')
-     
-    } else {
-      // Redirect back to login on incorrect password
-     
-      return res.redirect("/admin/login");
-      
-      
+      return res.redirect('/admin') 
     }
+
+  
+
   } catch (error) {
     console.error("Login error:", error);
 
-    // Redirect to a generic error page
+    
     return res.redirect("/admin/pageerror");
   }
 };
@@ -140,7 +134,7 @@ const loadDashboard = async (req, res) => {
          
       }));
 
-      console.log("product data",productData);
+    
 
 
       // chart data for category

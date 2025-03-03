@@ -191,8 +191,10 @@ const securePassword=async (password)=>{
 const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
+        
 
         console.log("User Data from Session:", req.session.userData);
+
 
         if (otp === req.session.userOtp) {
             const user = req.session.userData;
@@ -238,10 +240,13 @@ const verifyOtp = async (req, res) => {
                 }
             }
 
-            return res.redirect("/login");
+           // return res.redirect("/login");
+           return res.json({ success: true, redirectUrl: "/login" });
 
         } else {
-            return res.status(400).json({ success: false, message: "Invalid OTP, Please try again" });
+
+            return res.status(400).json({ success: false, message: "Invalid OTP, Please try again" }); 
+
         }
     } catch (error) {
         console.error("Error Verifying OTP", error);

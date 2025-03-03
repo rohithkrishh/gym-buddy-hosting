@@ -101,13 +101,35 @@
                     </div>
                     <% if (cart && cart.items.length > 0) { %>
                         <div class="cart-action text-end">
-                            <button id="checkout-btn" class="btn" 
-                                <% if (cart.items.some(item => item.outOfStock)) { %> 
-                                    disabled 
-                                <% } %> 
-                                onclick="proceedToCheckout()">
-                                <i class="fi-rs-box-alt mr-10"></i> Proceed To Checkout
-                            </button>
+                            <div class="col-lg-6 col-md-12">
+                                <div class="border p-md-4 p-30 border-radius cart-totals">
+                                    <div class="heading_s1 mb-3">
+                                        <h4>Cart Totals</h4>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="cart_total_label">Total</td>
+                                                    <td class="cart_total_amount" id="cartTotal"><strong><span
+                                                                class="font-xl fw-900 text-brand">₹ <%= cartTotal || null %>
+                                                                    </span></strong></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+            
+                                        <button id="checkout-btn" class="btn" 
+                                        <% if (cart.items.some(item => item.outOfStock)) { %> 
+                                            disabled 
+                                        <% } %> 
+                                        onclick="proceedToCheckout()">
+                                        <i class="fi-rs-box-alt mr-10"></i> Proceed To Checkout
+                                    </button>
+            
+                                </div>
+                            </div>
+                           
                         </div>
     
                         <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
@@ -116,29 +138,6 @@
 
                 <!-- Cart Total -->
 
-                <div class="col-lg-6 col-md-12">
-                    <div class="border p-md-4 p-30 border-radius cart-totals">
-                        <div class="heading_s1 mb-3">
-                            <h4>Cart Totals</h4>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <td class="cart_total_label">Total</td>
-                                        <td class="cart_total_amount" id="cartTotal"><strong><span
-                                                    class="font-xl fw-900 text-brand">₹ <%= cartTotal || null %>
-                                                        </span></strong></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <a href="/checkOut" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To
-                            Checkout</a>
-
-                    </div>
-                </div>
                 <% } %>
             </div>
         </div>
@@ -243,7 +242,7 @@
     const subtotalElements = document.querySelectorAll('[id^="subtotal-"]');
 
     subtotalElements.forEach((element) => {
-        let amountText = element.textContent.replace(/[^0-9.]/g, ''); // Remove ₹ symbol & extra characters
+        let amountText = element.textContent.replace(/[^0-9.]/g, ''); 
         let amount = parseFloat(amountText);
 
         if (!isNaN(amount)) {
@@ -253,7 +252,7 @@
 
     // Update the cart total in the DOM
     const cartTotalElement = document.querySelector("#cartTotal span");
-    cartTotalElement.textContent = `₹ ${total.toFixed(2)}`; // Format with 2 decimal places
+    cartTotalElement.textContent = `₹ ${total.toFixed()}`; 
 }
 
 

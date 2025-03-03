@@ -22,8 +22,10 @@ const getCartPage = async (req, res) => {
                     path: "variants",
                     select: "type weight salePrice regularPrice stock",
                 },
-                select: "productName productImages variants",
+                select: "productName productImages variants isBlocked",
             });
+
+            cart.items = cart.items.filter((item)=>!item.product.isBlocked)
 
         if (!cart || cart.items.length === 0) {
             return res.render("shop-cart", { cart: { items: [], cartTotal: null } });

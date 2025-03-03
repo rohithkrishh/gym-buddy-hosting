@@ -355,8 +355,9 @@ const verifyChangePassOtp = async (req, res) => {
 const addAddress = async (req,res)=>{
 
 try {
+    const fromCheckout = req.query.from === "checkout"
     const user = req.session.user;
-    res.render("add-address",{user:user})
+    res.render("add-address",{user:user,fromCheckout})
 } catch (error) {
    res.redirect("/pageNotFound"); 
 }
@@ -368,8 +369,11 @@ const postAddAddress = async (req,res)=>{
     try {
         const userId = req.session.user;
         const userData = await User.findOne({_id:userId});
-        const {addressType,name,city,landMark,state,pincode,phone,altPhone} = req.body;
-         
+        const {addressType,name,city,landMark,state,pincode,phone,altPhone,fromCheckout} = req.body;
+        
+
+        console.log("neee",req.body)
+        
         const userAddress =  await Address.findOne({userId : userData._id});
         if(!userAddress){
         const newAddress = new Address({
@@ -381,8 +385,17 @@ const postAddAddress = async (req,res)=>{
     }else{
         userAddress.address.push({addressType,name,city,landMark,state,pincode,phone,altPhone})
         await userAddress.save()
-        res.redirect("/userProfile")
+       
     }
+
+if(fromCheckout){
+    console.log("checkout")
+    res.redirect("/checkout")
+}else{
+    console.log("normal")
+    res.redirect("/userProfile")
+}
+
 
     } catch (error) {
         console.error("error adding address:",error)
@@ -391,6 +404,46 @@ const postAddAddress = async (req,res)=>{
 
 
 }
+
+
+// const postAddAddress = async (req, res) => {
+//     try {
+//         const userId = req.session.user;
+//         const userData = await User.findOne({ _id: userId });
+//         const { addressType, name, city, landMark, state, pincode, phone, altPhone, fromCheckout,redirectTo } = req.body;
+//         console.log("req.body",req.body)
+
+//         // Check if coming from checkout
+//         const isFromCheckout = req.query === "checkout" 
+//         console.log("isFromCheckout:", isFromCheckout);
+
+//         let userAddress = await Address.findOne({ userId: userData._id });
+
+//         if (!userAddress) {
+//             const newAddress = new Address({
+//                 userId: userData._id,
+//                 address: [{ addressType, name, city, landMark, state, pincode, phone, altPhone }],
+//             });
+//             await newAddress.save();
+//         } else {
+//             userAddress.address.push({ addressType, name, city, landMark, state, pincode, phone, altPhone });
+//             await userAddress.save();
+//         }
+
+//         // Corrected redirection logic
+//         if (isFromCheckout) {
+//             console.log("Redirecting to checkout...");
+//             return res.redirect("/checkout");
+//         } else {
+//             console.log("Redirecting to user profile...");
+//             return res.redirect("/userProfile");
+//         }
+//     } catch (error) {
+//         console.error("Error adding address:", error);
+//         res.redirect("/pageNotFound");
+//     }
+// };
+
 
 const editAddress = async (req,res)=>{
 

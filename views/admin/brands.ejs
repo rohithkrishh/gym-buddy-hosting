@@ -34,7 +34,7 @@
     <div class="card-body">
       <div class="row">
         <div class="col-md-3">
-          <form method="post" action="/admin/addBrand" enctype="multipart/form-data">
+          <form method="post" action="/admin/addBrand" onsubmit="return validateForm(event)" >
             <div class="mb-4">
               <label for="product_name" class="form-label">Brand Name</label>
               <input
@@ -43,6 +43,7 @@
                 placeholder="Type here"
                 class="form-control"
               />
+              <div id="name-error" class="error-message"> </div>
             </div>
     
             <label for="product_name" class="form-label">Brand Image</label>
@@ -91,19 +92,7 @@
                     </div>
                   </td>
                   <td class="text-start">
-                    <!-- <% if(brand.isBlocked===true){%>
-                    <span
-                      class="badge rounded-pill alert-danger"
-                      style="width: 60px"
-                      >Blocked</span
-                    >
-               <%}else{%>
-                    <span
-                      class="badge rounded-pill alert-success"
-                      style="width: 60px"
-                      >Active</span
-                    >
-                    <%}%> -->
+                
                     <% if (brand.isBlocked === true) { %>
                       <span
                         class="badge rounded-pill"
@@ -158,3 +147,132 @@
 </script>
 <%- include("../../views/partials/admin/footer") %>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+//   function validateForm(event){
+// event.preventDefault()
+
+// const name = document.getElementsByName("name")[0].value.trim()
+// isValid = true;
+// console.log("name",name)
+
+// if(name==""){
+
+//   displayErrorMessage("name-error","Please enter a name")
+//   isValid = false
+// }else if(!/^[a-zA-Z\s]+$/.test(name)){
+//   displayErrorMessage("name-error","brand name should contain only alphabetic characters");
+//   isValid = false
+
+//     }
+
+//     if (isValid) {
+//     // Use FormData to handle file uploads
+//     const formData = new FormData(event.target);
+    
+//     fetch('/admin/addBrand', {
+//       method: 'POST',
+//       body: formData
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//       if (data.success) {
+//         Swal.fire({
+//           icon: 'success',
+//           title: 'Success',
+//           text: data.message,
+//           timer: 1500
+//         }).then(() => {
+//           window.location.reload();
+//         });
+//       } else {
+//         Swal.fire({
+//           icon: 'error',
+//           title: 'Error',
+//           text: data.message
+//         });
+//       }
+//     })
+//     .catch(error => {
+//       Swal.fire({
+//         icon: 'error',
+//         title: 'Server Error',
+//         text: 'Something went wrong, please try again later'
+//       });
+//       console.error('Error:', error);
+//     });
+//   }
+
+
+
+//   }
+
+//   function displayErrorMessage(elementId,message){
+//     var errorElement = document.getElementById(elementId)
+//     errorElement.innerText = message
+//     errorElement.style.display = "block"
+//   }
+
+
+function validateForm(event) {
+  event.preventDefault();
+
+  const name = document.getElementsByName("name")[0].value.trim();
+  let isValid = true;
+
+  if (name == "") {
+    Swal.fire({
+      icon: 'error',
+      title: 'Validation Error',
+      text: 'Please enter a name'
+    });
+    isValid = false;
+  } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Validation Error',
+      text: 'Brand name should contain only alphabetic characters'
+    });
+    isValid = false;
+  }
+
+  if (isValid) {
+    const formData = new FormData(event.target);
+    
+    fetch('/admin/addBrand', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: data.message,
+          timer: 1500
+        }).then(() => {
+          window.location.reload();
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message
+        });
+      }
+    })
+    .catch(error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Server Error',
+        text: 'Something went wrong, please try again later'
+      });
+      console.error('Error:', error);
+    });
+  }
+}
+
+</script>

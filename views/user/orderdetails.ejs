@@ -267,7 +267,7 @@
                         </td>
                         <td data-label="Quantity"><%= item.quantity %></td>
                         <td data-label="Price">₹<%= item.salePrice.toFixed(2) %></td>
-                        <td data-label="Total">₹<%= item.salePrice*item.quantity %></td>
+                        <td data-label="Total">₹<%= item.salePrice.toFixed()*item.quantity %></td>
                         
                     </tr>
             </tbody>
@@ -301,17 +301,26 @@
             <strong>Phone:</strong> <%= order.shippingAddress.phone %>
         </p>
 
-        <% if ( order.paymentMethod == 'online' && order.paymentStatus !== 'Pending'  || order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Delivered' && order.orderStatus !== 'Returned') { %>
+     
+        <% if (
+            order.paymentMethod === 'Online' && 
+            order.paymentStatus !== 'Pending' && 
+            order.paymentStatus !== 'Failed' && 
+            order.orderStatus !== 'Cancelled' && 
+            order.orderStatus !== 'Delivered' && 
+            order.orderStatus !== 'Returned'
+        ) { %>
             <button class="btn cancel-btn" data-order-id="<%= order.id %>">Cancel Order</button>
         <% } %>
-
+        
+        
   
 
         <% if (order.orderStatus === 'Delivered' || new Date() - new Date(order.deliveredAt) <= 10 * 24 * 60 * 60 * 1000) { %>
             <button class="btn return-btn" data-order-id="<%= order._id %>">Return Order</button>
         <% } %>
 
-        <% if (order.orderStatus !== 'Cancelled') { %>
+        <% if (order.orderStatus !== 'Cancelled' && order.orderStatus != 'Pending') { %>
 
             <a href="/download-invoice/<%= order._id %>" class="btnn download-btn">Download Invoice (PDF)</a>
          
