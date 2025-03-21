@@ -39,6 +39,8 @@ const loadHomepage = async (req, res) => {
         }).populate("category", "name categoryOffer")
         .sort({ createdAt: 1 });
 
+
+
         if (req.isAuthenticated()) {
             const userData = await User.findOne({ _id: req.user._id });
            
@@ -49,7 +51,7 @@ const loadHomepage = async (req, res) => {
         }
     } catch (error) {
         console.error("Error loading homepage:", error);
-        res.status(500).send("Server error");
+        res.redirect("/pageNotFound")
     }
 };
 

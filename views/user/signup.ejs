@@ -149,11 +149,15 @@
       };
 
       
-    nameInput.addEventListener("input", () => {
+      nameInput.addEventListener("input", () => {
     const trimmedValue = nameInput.value.trim();
     console.log(`Original: "${nameInput.value}", Trimmed: "${trimmedValue}"`);
-    validateField(nameInput, trimmedValue.length >= 3, nameError, "Full name must be at least 3 characters long.");
-  });
+
+    const namePattern = /^[A-Za-z\s]+$/; // Only letters and spaces allowed
+    const isValid = namePattern.test(trimmedValue) && trimmedValue.length >= 3;
+
+    validateField(nameInput, isValid, nameError, "Name must be at least 3 characters long and should not contain special characters or numbers.");
+});
 
       emailInput.addEventListener("input", () => {
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -161,7 +165,7 @@
       });
 
       phoneInput.addEventListener("input", () => {
-        const phonePattern = /^[0-9]{10}$/;
+        const phonePattern = /^[6-9][0-9]{9}$/;
         validateField(phoneInput, phonePattern.test(phoneInput.value.trim()), phoneError, "Please enter a valid 10-digit phone number.");
       });
 
